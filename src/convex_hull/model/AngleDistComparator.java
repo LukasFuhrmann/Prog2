@@ -18,8 +18,13 @@ public class AngleDistComparator implements Comparator<Point> {
         this.referenceP = referenceP;
     }
 
-    public int compare(Point , Point) {
-
+    @Override
+    public int compare(Point p, Point q) {
+        int result = referenceP.leftOf(p, q);
+        if (result == 0) {
+            return (int) Math.signum(referenceP.dist(p) - referenceP.dist(q));
+        } else {
+            return result;
+        }
     }
-
 }
