@@ -1,7 +1,5 @@
 package convex_hull.model;
 
-import java.util.Objects;
-
 /**
  *
  */
@@ -38,22 +36,25 @@ public class Point implements Comparable<Point> {
 
     @Override
     public int compareTo(Point o) {
-        int result = this.getX() - o.getX();
+        int result = x - o.getX();
         if (result == 0) {
-            result = this.getY() - o.getY();
+            result = y - o.getY();
         }
         return result;
     }
 
     /**
-     * @param p
-     * @param q
-     * @return
+     * Checks if a point lies left, right or collinear to a vector created by
+     * two other points in the Euclidean plane.
+     *
+     * @param p the point which position is checked.
+     * @param q the point which creates the vector through q minus this point.
+     * @return an positive/negative integer if p lies left/right of the
+     * vector created by q minus this point, 0 if p is collinear to the vector.
      */
     public int leftOf(Point p, Point q) {
-        int result = 0;
-        return result = ((q.getX() - this.getX()) * (p.getY() - this.getY()))
-                - ((p.getX() - this.getX()) * (q.getY() - this.getY()));
+        return ((q.getX() - this.x) * (p.getY() - this.y))
+                - ((p.getX() - this.x) * (q.getY() - this.y));
     }
 
     public double dist(Point p) {
@@ -74,6 +75,6 @@ public class Point implements Comparable<Point> {
 
     @Override
     public int hashCode() {
-        return x + y + 2000;
+        return x * 23 + y * 53;
     }
 }

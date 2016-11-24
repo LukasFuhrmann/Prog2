@@ -10,6 +10,10 @@ public class AngleDistComparator implements Comparator<Point> {
 
     private Point referenceP;
 
+    public AngleDistComparator(Point reference) {
+        referenceP = reference;
+    }
+
     public Point getReferenceP() {
         return referenceP;
     }
