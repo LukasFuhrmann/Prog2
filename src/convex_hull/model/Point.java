@@ -66,7 +66,7 @@ public class Point implements Comparable<Point> {
         boolean result = false;
         if (o instanceof Point) {
             Point p = Point.class.cast(o);
-            if ((this.x == p.getX()) && (this.y == (p.getY()))) {
+            if ((this.x == p.getX()) && (this.y == p.getY())) {
                 result = true;
             }
         }
