@@ -3,7 +3,7 @@ package convex_hull.model;
 import java.util.Comparator;
 
 /**
- *
+ * This class implements a point in the Euclidean plane.
  */
 public class AngleDistComparator implements Comparator<Point> {
 
