@@ -58,7 +58,7 @@ public class Point implements Comparable<Point> {
     }
 
     public double dist(Point p) {
-        return Math.sqrt((this.x - p.getX()) ^ 2 + (this.y - p.getY()) ^ 2);
+        return Math.sqrt(((this.x - p.getX()) ^ 2) + ((this.y - p.getY()) ^ 2));
     }
 
     @Override
