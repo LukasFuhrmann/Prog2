@@ -50,15 +50,15 @@ public class Point implements Comparable<Point> {
      * given by the comparison of the x values first, then the comparison of
      * the y values if both points have the same x value.
      *
-     * @param o point which is compared to this point.
+     * @param point point which is compared to this point.
      * @return a negative integer, zero, or a positive integer as this point
      * is less than, equal to, or greater than the other point.
      */
     @Override
-    public int compareTo(Point o) {
-        int result = x - o.getX();
+    public int compareTo(Point point) {
+        int result = x - point.getX();
         if (result == 0) {
-            result = y - o.getY();
+            result = y - point.getY();
         }
         return result;
     }
@@ -71,7 +71,8 @@ public class Point implements Comparable<Point> {
      * @param p    the point which position is checked.
      * @param head head of the vector.
      * @return an positive/negative integer if p lies left/right of the
-     * vector created by head minus this point, 0 if p is collinear to the vector.
+     * vector created by head minus this point, 0 if p is collinear to the
+     * vector.
      */
     public int leftOf(Point p, Point head) {
         return ((head.getX() - this.x) * (p.getY() - this.y))
@@ -110,9 +111,9 @@ public class Point implements Comparable<Point> {
     }
 
     /**
-     *
      * @return hash code value for this point.
-     * @see Java.convex_hull.model.Point#equals(Point)
+     * @see #equals(Object)
+     * @see java.lang.System#identityHashCode
      */
     @Override
     public int hashCode() {
