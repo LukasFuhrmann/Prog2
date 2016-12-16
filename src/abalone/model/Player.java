@@ -3,5 +3,5 @@ package abalone.model;
 /**
  *
  */
-public class Player {
+public enum Player {
 }
