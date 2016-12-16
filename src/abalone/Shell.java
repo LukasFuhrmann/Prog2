@@ -118,7 +118,7 @@ public final class Shell {
         System.out.println("HELP: Here will you find all available commands. ");
         System.out.println("NOTE: You only need the first letter of a command"
                 + " and the case sensitivity is ignored.");
-        System.out.println("<NEW>          : Creates a new field.");
+        System.out.println("<NEW><d>        : Creates a new game.");
         System.out.println("<PRINT>        : Prints out all points in current"
                 + " field.");
         System.out.println("<ADD><X><Y>    : Adds the point (X, Y) to the "
