@@ -1,6 +1,7 @@
 package abalone;
 
 import abalone.model.AbaloneGame;
+import abalone.model.Board;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,6 +16,8 @@ import java.util.Scanner;
  */
 public final class Shell {
 
+    private static Board game = new AbaloneGame();
+
     private Shell() {
     }
 
@@ -27,21 +30,9 @@ public final class Shell {
     public static void main(String[] args) throws IOException {
         BufferedReader stdin;
         stdin = new BufferedReader(new InputStreamReader(System.in));
-        execute(stdin);
-    }
-
-    /**
-     * Implements the input interface. Checks if user inputs are valid
-     * commands and communicates with the game.
-     *
-     * @param stdin input reader for command on console.
-     * @throws IOException If an input or output exception occurred.
-     */
-    private static void execute(BufferedReader stdin) throws IOException {
         boolean quit = false;
-        AbaloneGame game = new AbaloneGame();
         while (!quit) {
-            System.out.print("ch> ");
+            System.out.print("abalone> ");
             String input = stdin.readLine();
             if (input == null) {
                 break;
@@ -51,28 +42,52 @@ public final class Shell {
             if (scanner.hasNext()) {
                 String command = scanner.next();
                 char cmd = command.toUpperCase().charAt(0);
+                quit = execute(scanner);
+            } else {
+                System.out.println("Error! No command.");
+            }
+            scanner.close();
+        }
+    }
+
+    /**
+     * Implements the input interface. Checks if user inputs are valid
+     * commands and communicates with the game.
+     *
+     * @param scanner reads command from console.
+     * @return true if program is stopped by command.
+     * @throws IOException If an input or output exception occurred.
+     */
+    private static boolean execute(Scanner scanner) throws IOException {
+        try {
+            if (scanner.hasNext()) {
+                String command = scanner.next();
+                char cmd = command.toUpperCase().charAt(0);
                 switch (cmd) {
                     case 'N':
                         startNewGame(scanner);
                         break;
-                    case 'A':
-                        add(scanner, field);
+                    case 'S':
+                        switchOpener();
                         break;
-                    case 'R':
-                        remove(scanner, field);
+                    case 'B':
+                        numbersOfBalls();
                         break;
                     case 'P':
-                        System.out.println(game.toString());
+                        System.out.println(game);
                         break;
-                    case 'C':
-                        System.out.println(field.printConvexHull());
+                    case 'L':
+                        changeLevel(scanner);
+                        break;
+                    case 'M':
+                        checkMove(scanner);
                         break;
                     case 'H':
                         help();
                         break;
                     case 'Q':
-                        quit = true;
-                        break;
+                        return true;
+                    break;
                     default:
                         System.out.println("Error! Illegal command. Use "
                                 + "<Help> for a overview of commands.");
@@ -81,35 +96,34 @@ public final class Shell {
                 System.out.println("Error! No command.");
             }
             scanner.close();
+        } catch (Exception) {
+
         }
+        return true;
+    }
+
+    private static void changeLevel(Scanner scanner) {
+    }
+
+    private static void switchOpener() {
+    }
+
+    private static void numbersOfBalls() {
+    }
+
+    private static void checkMove(Scanner scanner) {
+
     }
 
     private static void startNewGame(Scanner scanner) {
-    }
-
-
-    private static void add(Scanner scanner, Field field) {
         if (!scanner.hasNextInt()) {
-            System.out.println("Error! Two integers are needed.");
+            error("Two integers are needed.");
         } else {
-            int firstIn = scanner.nextInt();
-            if (!scanner.hasNextInt()) {
-                System.out.println("Error! Two integers are needed.");
+            int size = scanner.nextInt();
+            if (size < game.MIN_SIZE) {
+                error("Game board size too small.");
             } else {
-                field.addPoint(firstIn, scanner.nextInt());
-            }
-        }
-    }
-
-    private static void remove(Scanner scanner, Field field) {
-        if (!scanner.hasNextInt()) {
-            System.out.println("Error! Two integers are needed.");
-        } else {
-            int firstIn = scanner.nextInt();
-            if (!scanner.hasNextInt()) {
-                System.out.println("Error! Two integers are needed.");
-            } else {
-                field.removePoint(firstIn, scanner.nextInt());
+                game = new AbaloneGame(size);
             }
         }
     }
@@ -118,15 +132,18 @@ public final class Shell {
         System.out.println("HELP: Here will you find all available commands. ");
         System.out.println("NOTE: You only need the first letter of a command"
                 + " and the case sensitivity is ignored.");
-        System.out.println("<NEW><d>        : Creates a new game.");
+        System.out.println("<NEW>          : Creates a new field.");
         System.out.println("<PRINT>        : Prints out all points in current"
                 + " field.");
         System.out.println("<ADD><X><Y>    : Adds the point (X, Y) to the "
                 + "field. Only integers are allowed for X,Y.");
         System.out.println("<REMOVE><X><Y> : Removes the point (X, Y) from "
                 + "the field. Only integers are allowed for X,Y.");
-        System.out.println("<CONVEX>       : Prints all points that are "
-                + "elements of the convex hull of the set of all points.");
+        System.out.println();
         System.out.println("<QUIT>         : Ends the program.");
+    }
+
+    private static void error(String err) {
+        System.out.println("Error! " + err);
     }
 }

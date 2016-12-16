@@ -1,9 +1,28 @@
 package abalone.model;
 
+import java.util.ArrayList;
+
 /**
  *
  */
 public class AbaloneGame implements Board, Cloneable {
+
+    private int boardSize = 9;
+    private Player openingPLayer = Player.HUMAN;
+    private Player currentPlayer = Player.HUMAN;
+    private Color humanColor = Color.BLACK;
+    private Ball[][] balls;
+    private ArrayList<Ball> blackBalls;
+    private ArrayList<Ball> whiteBalls;
+    private int whiteBallsLost = 0;
+    private int blackBallsLost = 0;
+
+    public AbaloneGame() {
+
+    }
+
+    public AbaloneGame(int size) {
+    }
 
     /**
      * Gets the player who should open or already has opened the game. As an
@@ -144,7 +163,7 @@ public class AbaloneGame implements Board, Cloneable {
      */
     @Override
     public int getNumberOfBalls(Color color) {
-        return 0;
+        return;
     }
 
     /**
@@ -168,6 +187,6 @@ public class AbaloneGame implements Board, Cloneable {
      */
     @Override
     public int getSize() {
-        return 0;
+        return boardSize;
     }
 }
