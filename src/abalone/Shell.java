@@ -6,6 +6,7 @@ import abalone.model.Board;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.IllegalFormatException;
 import java.util.Scanner;
 
 
@@ -17,6 +18,8 @@ import java.util.Scanner;
 public final class Shell {
 
     private static Board game = new AbaloneGame();
+    private static final String ERROR = "Error! ";
+    private static final String PROMPT = "abalone> ";
 
     private Shell() {
     }
@@ -28,25 +31,28 @@ public final class Shell {
      * @throws IOException If an input or output exception occurred.
      */
     public static void main(String[] args) throws IOException {
-        BufferedReader stdin;
-        stdin = new BufferedReader(new InputStreamReader(System.in));
-        boolean quit = false;
-        while (!quit) {
-            System.out.print("abalone> ");
-            String input = stdin.readLine();
-            if (input == null) {
-                break;
+        try {
+            BufferedReader stdin = new BufferedReader(
+                    new InputStreamReader(System.in));
+            boolean quit = false;
+            while (!quit) {
+                System.out.print(PROMPT);
+                String input = stdin.readLine();
+                if (input == null) {
+                    break;
+                }
+                Scanner scanner = new Scanner(input);
+                scanner.useDelimiter("\\s+");
+                if (scanner.hasNext()) {
+                    quit = execute(scanner);
+                } else {
+                    throw new IllegalArgumentException("No command!");
+                }
             }
-            Scanner scanner = new Scanner(input);
-            scanner.useDelimiter("\\s+");
-            if (scanner.hasNext()) {
-                String command = scanner.next();
-                char cmd = command.toUpperCase().charAt(0);
-                quit = execute(scanner);
-            } else {
-                System.out.println("Error! No command.");
-            }
-            scanner.close();
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            error(e.getMessage());
+        } catch (IOException eIO) {
+
         }
     }
 
@@ -59,47 +65,36 @@ public final class Shell {
      * @throws IOException If an input or output exception occurred.
      */
     private static boolean execute(Scanner scanner) throws IOException {
-        try {
-            if (scanner.hasNext()) {
-                String command = scanner.next();
-                char cmd = command.toUpperCase().charAt(0);
-                switch (cmd) {
-                    case 'N':
-                        startNewGame(scanner);
-                        break;
-                    case 'S':
-                        switchOpener();
-                        break;
-                    case 'B':
-                        numbersOfBalls();
-                        break;
-                    case 'P':
-                        System.out.println(game);
-                        break;
-                    case 'L':
-                        changeLevel(scanner);
-                        break;
-                    case 'M':
-                        checkMove(scanner);
-                        break;
-                    case 'H':
-                        help();
-                        break;
-                    case 'Q':
-                        return true;
-                    break;
-                    default:
-                        System.out.println("Error! Illegal command. Use "
-                                + "<Help> for a overview of commands.");
-                }
-            } else {
-                System.out.println("Error! No command.");
-            }
-            scanner.close();
-        } catch (Exception) {
-
+        char cmd = scanner.next().toUpperCase().charAt(0);
+        switch (cmd) {
+            case 'N':
+                startNewGame(scanner);
+                break;
+            case 'S':
+                switchOpener();
+                break;
+            case 'B':
+                numbersOfBalls();
+                break;
+            case 'P':
+                System.out.println(game);
+                break;
+            case 'L':
+                changeLevel(scanner);
+                break;
+            case 'M':
+                checkMove(scanner);
+                break;
+            case 'H':
+                help();
+                break;
+            case 'Q':
+                return true;
+            default:
+                throw new IllegalArgumentException("Illegal command. Use <Help>"
+                        + " for a overview of commands.");
         }
-        return true;
+        return false;
     }
 
     private static void changeLevel(Scanner scanner) {
@@ -117,11 +112,11 @@ public final class Shell {
 
     private static void startNewGame(Scanner scanner) {
         if (!scanner.hasNextInt()) {
-            error("Two integers are needed.");
+            throw new IllegalArgumentException("Two integers are needed.");
         } else {
             int size = scanner.nextInt();
             if (size < game.MIN_SIZE) {
-                error("Game board size too small.");
+                throw new IllegalArgumentException("Board size too small.");
             } else {
                 game = new AbaloneGame(size);
             }
@@ -144,6 +139,6 @@ public final class Shell {
     }
 
     private static void error(String err) {
-        System.out.println("Error! " + err);
+        System.err.println(ERROR + err);
     }
 }

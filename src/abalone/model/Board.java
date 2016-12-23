@@ -3,21 +3,21 @@ package abalone.model;
 
 /**
  * Interface for an Abalone (lite) game.
- *
+ * <p>
  * A human plays against the machine. The human's ground lines are always the
  * lowest rows, whereas the ground lines of the machine are the highest rows.
  * The human plays from bottom to top, the machine from top to bottom. The user
  * with the black balls opens the game. Winner is who first pushes
  * out/eliminates six of the opponent's balls.
- *
+ * <p>
  * <p>
  * There are some differences to traditional Abalone:
  * <ul>
  * <li>In case that one player has no option to make a valid move, he must miss
- *     a turn. The other player can make a move in any case.
+ * a turn. The other player can make a move in any case.
  * <li>A move can involve more than three (own) balls.
  * <li>Sideward moves, i.e., changing the diagonal of more than one own ball not
- *     in the same row, are not allowed.
+ * in the same row, are not allowed.
  * <li>The game may never end.
  * </ul>
  */
@@ -59,7 +59,7 @@ public interface Board {
     /**
      * Checks if the provided coordinates are valid slots within the game.
      *
-     * @param row The row.
+     * @param row  The row.
      * @param diag The diagonal.
      * @return {@code true} iff valid coordinates.
      */
@@ -69,7 +69,7 @@ public interface Board {
      * Checks if the provided coordinates are valid slots within the game or 1
      * slot outside.
      *
-     * @param row The row.
+     * @param row  The row.
      * @param diag The diagonal.
      * @return {@code true} iff valid coordinates.
      */
@@ -81,21 +81,21 @@ public interface Board {
      * immutable. Instead, a new board/game is returned, which is a copy of
      * {@code this} with the move executed.
      *
-     * @param rowFrom The slot's row number from which the ball of the human
-     *        player should be moved.
+     * @param rowFrom  The slot's row number from which the ball of the human
+     *                 player should be moved.
      * @param diagFrom The slot's diagonal number from which the ball of the
-     *        human player should be moved.
-     * @param rowTo The slot's row number to which the ball of the human player
-     *        should be moved.
-     * @param diagTo The slot's diagonal number to which the ball of the human
-     *        player should be moved.
+     *                 human player should be moved.
+     * @param rowTo    The slot's row number to which the ball of the human player
+     *                 should be moved.
+     * @param diagTo   The slot's diagonal number to which the ball of the human
+     *                 player should be moved.
      * @return A new board with the move executed. If the move is not valid,
-     *         then {@code null} will be returned.
-     * @throws IllegalStateException If the game is already over, or it is not
-     *         the human's turn.
+     * then {@code null} will be returned.
+     * @throws IllegalStateException    If the game is already over, or it is not
+     *                                  the human's turn.
      * @throws IllegalArgumentException If the provided parameters are invalid,
-     *         e.g., the from slot lies outside the grid or the to slot outside
-     *         the grid plus an one-element border.
+     *                                  e.g., the from slot lies outside the grid or the to slot outside
+     *                                  the grid plus an one-element border.
      */
     Board move(int rowFrom, int diagFrom, int rowTo, int diagTo);
 
@@ -106,7 +106,7 @@ public interface Board {
      *
      * @return A new board with the move executed.
      * @throws IllegalStateException If the game is already over, or it is not
-     *         the machine's turn.
+     *                               the machine's turn.
      */
     Board machineMove();
 
@@ -129,7 +129,7 @@ public interface Board {
      *
      * @return The winner.
      * @throws IllegalStateException If the game is not over yet, then there is
-     *         no winner.
+     *                               no winner.
      */
     Player getWinner();
 
@@ -147,7 +147,7 @@ public interface Board {
      * coordinates. If the slot is empty, then the result is no color (e.g.
      * NONE).
      *
-     * @param row The row of the slot in the game grid.
+     * @param row  The row of the slot in the game grid.
      * @param diag The diagonal of the slot in the game grid.
      * @return The slot color.
      */
