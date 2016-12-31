@@ -3,19 +3,20 @@ package abalone.model;
 /**
  *
  */
-public class Ball {
+public class Ball implements Cloneable {
 
     private Player currentPlayer;
     private Color color;
-    private int diag1;
-    private int diag2;
+    private int diag;
     private int row;
 
-    public Ball(Player currentP, Color color, int diag1, int row, int size) {
+    public Ball() {
+    }
+
+    public Ball(Player currentP, Color color, int diag, int row) {
         this.currentPlayer = currentP;
         this.color = color;
-        this.diag1 = diag1;
-        this.diag2 =  row - diag1 + Math.floorDiv(size, 2);
+        this.diag = diag;
         this.row = row;
     }
 
@@ -35,20 +36,16 @@ public class Ball {
         this.color = color;
     }
 
-    public int getDiag1() {
-        return diag1;
+    public int getDiag() {
+        return diag;
     }
 
-    public void setDiag1(int diag1) {
-        this.diag1 = diag1;
+    public void setDiag(int diag1) {
+        this.diag = diag1;
     }
 
-    public int getDiag2() {
-        return diag2;
-    }
-
-    public void setDiag2(int diag2) {
-        this.diag2 = diag2;
+    public int getDiag2(int size) {
+        return row - diag + Math.floorDiv(size, 2);
     }
 
     public int getRow() {
@@ -59,5 +56,9 @@ public class Ball {
         this.row = row;
     }
 
+    @Override
+    public Ball clone() {
+        return new Ball(currentPlayer, color, diag, row);
+    }
 
 }

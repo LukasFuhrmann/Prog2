@@ -1,6 +1,7 @@
 package abalone.model;
 
-import java.util.ArrayList;
+
+import java.util.LinkedList;
 
 /**
  *
@@ -12,44 +13,90 @@ public class AbaloneGame implements Board, Cloneable {
     private Player currentPlayer = Player.HUMAN;
     private Color humanColor = Color.BLACK;
     private Ball[][] balls;
-    private ArrayList<Ball> blackBalls;
-    private ArrayList<Ball> whiteBalls;
+    private LinkedList<Ball> blackBalls;
+    private LinkedList<Ball> whiteBalls;
     private int whiteBallsLost = 0;
     private int blackBallsLost = 0;
+    private int level = 2;
 
     public AbaloneGame() {
-
+        balls = new Ball[boardSize][boardSize];
     }
 
     public AbaloneGame(int size) {
+
     }
 
     /**
-     * Gets the player who should open or already has opened the game. As an
-     * invariant, this player has the black balls.
+     * Constructor that starts a new game only changing the opening player
+     * from before.
      *
-     * @return The player who makes the initial move.
+     * @param oldOpeningPlayer
+     */
+    public AbaloneGame(Player oldOpeningPlayer) {
+        if (oldOpeningPlayer == Player.HUMAN) {
+            openingPLayer = Player.HUMAN;
+            humanColor = Color.BLACK;
+        } else {
+            openingPLayer = Player.MACHINE;
+            humanColor = Color.WHITE;
+        }
+    }
+
+    public void setBoardSize(int boardSize) {
+        this.boardSize = boardSize;
+    }
+
+    public void setOpeningPLayer(Player openingPLayer) {
+        this.openingPLayer = openingPLayer;
+    }
+
+    public void setCurrentPlayer(Player currentPlayer) {
+        this.currentPlayer = currentPlayer;
+    }
+
+    public void setHumanColor(Color humanColor) {
+        this.humanColor = humanColor;
+    }
+
+    public void setBalls(Ball[][] balls) {
+        this.balls = balls;
+    }
+
+    public void setBlackBalls(LinkedList<Ball> blackBalls) {
+        this.blackBalls = blackBalls;
+    }
+
+    public void setWhiteBalls(LinkedList<Ball> whiteBalls) {
+        this.whiteBalls = whiteBalls;
+    }
+
+    public void setWhiteBallsLost(int whiteBallsLost) {
+        this.whiteBallsLost = whiteBallsLost;
+    }
+
+    public void setBlackBallsLost(int blackBallsLost) {
+        this.blackBallsLost = blackBallsLost;
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     public Player getOpeningPlayer() {
-        return null;
+        return openingPLayer;
     }
 
     /**
-     * Gets the color of the human player.
-     *
-     * @return The tile color of the human.
+     * {@inheritDoc}
      */
     @Override
     public Color getHumanColor() {
-        return null;
+        return humanColor;
     }
 
     /**
-     * Gets the player who is allowed to execute the next move.
-     *
-     * @return The player who shall make the next move.
-     * @throws IllegalStateException If the game is already over.
+     * {@inheritDoc}
      */
     @Override
     public Player getNextPlayer() {
@@ -57,24 +104,15 @@ public class AbaloneGame implements Board, Cloneable {
     }
 
     /**
-     * Checks if the provided coordinates are valid slots within the game.
-     *
-     * @param row  The row.
-     * @param diag The diagonal.
-     * @return {@code true} iff valid coordinates.
+     * {@inheritDoc}
      */
     @Override
     public boolean isValidPosition(int row, int diag) {
-        return false;
+
     }
 
     /**
-     * Checks if the provided coordinates are valid slots within the game or 1
-     * slot outside.
-     *
-     * @param row  The row.
-     * @param diag The diagonal.
-     * @return {@code true} iff valid coordinates.
+     * {@inheritDoc}
      */
     @Override
     public boolean isValidTarget(int row, int diag) {
@@ -82,26 +120,7 @@ public class AbaloneGame implements Board, Cloneable {
     }
 
     /**
-     * Executes a human move. Eliminating own balls is allowed. This method does
-     * not change the state of this instance, which is treated here as
-     * immutable. Instead, a new board/game is returned, which is a copy of
-     * {@code this} with the move executed.
-     *
-     * @param rowFrom  The slot's row number from which the ball of the human
-     *                 player should be moved.
-     * @param diagFrom The slot's diagonal number from which the ball of the
-     *                 human player should be moved.
-     * @param rowTo    The slot's row number to which the ball of the human player
-     *                 should be moved.
-     * @param diagTo   The slot's diagonal number to which the ball of the human
-     *                 player should be moved.
-     * @return A new board with the move executed. If the move is not valid,
-     * then {@code null} will be returned.
-     * @throws IllegalStateException    If the game is already over, or it is not
-     *                                  the human's turn.
-     * @throws IllegalArgumentException If the provided parameters are invalid,
-     *                                  e.g., the from slot lies outside the grid or the to slot outside
-     *                                  the grid plus an one-element border.
+     * {@inheritDoc}
      */
     @Override
     public Board move(int rowFrom, int diagFrom, int rowTo, int diagTo) {
@@ -109,13 +128,7 @@ public class AbaloneGame implements Board, Cloneable {
     }
 
     /**
-     * Executes a machine move. This method does not change the state of this
-     * instance, which is treated here as immutable. Instead, a new board/game
-     * is returned, which is a copy of {@code this} with the move executed.
-     *
-     * @return A new board with the move executed.
-     * @throws IllegalStateException If the game is already over, or it is not
-     *                               the machine's turn.
+     * {@inheritDoc}
      */
     @Override
     public Board machineMove() {
@@ -123,9 +136,7 @@ public class AbaloneGame implements Board, Cloneable {
     }
 
     /**
-     * Sets the skill level of the machine.
-     *
-     * @param level The skill as a number, must be at least 1.
+     * {@inheritDoc}
      */
     @Override
     public void setLevel(int level) {
@@ -133,9 +144,7 @@ public class AbaloneGame implements Board, Cloneable {
     }
 
     /**
-     * Checks if the game is over, i.e., one player has won.
-     *
-     * @return {@code true} if and only if the game is over.
+     * {@inheritDoc}
      */
     @Override
     public boolean isGameOver() {
@@ -143,11 +152,7 @@ public class AbaloneGame implements Board, Cloneable {
     }
 
     /**
-     * Checks if the game state is won. Only valid if the game is already over.
-     *
-     * @return The winner.
-     * @throws IllegalStateException If the game is not over yet, then there is
-     *                               no winner.
+     * {@inheritDoc}
      */
     @Override
     public Player getWinner() {
@@ -155,25 +160,15 @@ public class AbaloneGame implements Board, Cloneable {
     }
 
     /**
-     * Gets the number of balls currently placed on the grid for the provided
-     * color. Only valid for black or white.
-     *
-     * @param color The color for which to count the balls.
-     * @return The number of balls.
+     * {@inheritDoc}
      */
     @Override
     public int getNumberOfBalls(Color color) {
-        return;
+        return 0;
     }
 
     /**
-     * Gets the color (black or white) of a ball in the slot at the specified
-     * coordinates. If the slot is empty, then the result is no color (e.g.
-     * NONE).
-     *
-     * @param row  The row of the slot in the game grid.
-     * @param diag The diagonal of the slot in the game grid.
-     * @return The slot color.
+     * {@inheritDoc}
      */
     @Override
     public Color getSlot(int row, int diag) {
@@ -181,12 +176,38 @@ public class AbaloneGame implements Board, Cloneable {
     }
 
     /**
-     * Gets the number of rows = the number of diagonals of this game.
-     *
-     * @return The size of the game.
+     * {@inheritDoc}
      */
     @Override
     public int getSize() {
         return boardSize;
+    }
+
+    @Override
+    public AbaloneGame clone() {
+        AbaloneGame clone = new AbaloneGame();
+        clone.setBoardSize(getSize());
+        clone.setOpeningPLayer(openingPLayer);
+        clone.setCurrentPlayer(currentPlayer);
+        clone.setLevel(level);
+        clone.setWhiteBallsLost(whiteBallsLost);
+        clone.setBlackBallsLost(blackBallsLost);
+        Ball[][] ballsClone = new Ball[boardSize][boardSize];
+        LinkedList<Ball> clBlackB = new LinkedList<>();
+        for (Ball ball : blackBalls) {
+            clBlackB.addFirst(ball.clone());
+            ballsClone[ball.getRow()][ball.getDiag()] =
+                    ballsClone[ball.getRow()][ball.getDiag()].clone();
+        }
+        LinkedList<Ball> clWhiteB = new LinkedList<>();
+        for (Ball ball : whiteBalls) {
+            clWhiteB.addFirst(ball.clone());
+            ballsClone[ball.getRow()][ball.getDiag()] =
+                    ballsClone[ball.getRow()][ball.getDiag()].clone();
+        }
+        clone.setBalls(ballsClone);
+        clone.setBlackBalls(clBlackB);
+        clone.setWhiteBalls(clWhiteB);
+        return clone;
     }
 }
