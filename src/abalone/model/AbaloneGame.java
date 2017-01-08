@@ -11,73 +11,46 @@ public class AbaloneGame implements Board, Cloneable {
     private int boardSize = 9;
     private Player openingPLayer = Player.HUMAN;
     private Player currentPlayer = Player.HUMAN;
-    private Color humanColor = Color.BLACK;
     private Ball[][] balls;
     private LinkedList<Ball> blackBalls;
     private LinkedList<Ball> whiteBalls;
     private int whiteBallsLost = 0;
     private int blackBallsLost = 0;
-    private int level = 2;
+    private int level;
 
-    public AbaloneGame() {
+    public AbaloneGame(int level) {
+        this.level = level;
         balls = new Ball[boardSize][boardSize];
+        fillBalls();
     }
 
-    public AbaloneGame(int size) {
-
-    }
-
-    /**
-     * Constructor that starts a new game only changing the opening player
-     * from before.
-     *
-     * @param oldOpeningPlayer
-     */
-    public AbaloneGame(Player oldOpeningPlayer) {
-        if (oldOpeningPlayer == Player.HUMAN) {
-            openingPLayer = Player.HUMAN;
-            humanColor = Color.BLACK;
+    public AbaloneGame(int size, Player oldOpeningPLayer, int level) {
+        if (size < MIN_SIZE || size % 2 == 0) {
+            throw new IllegalArgumentException("Board size has to be odd "
+                    + "and at least " + MIN_SIZE + ".");
         } else {
-            openingPLayer = Player.MACHINE;
-            humanColor = Color.WHITE;
+            openingPLayer = oldOpeningPLayer;
+            currentPlayer = openingPLayer;
+            boardSize = size;
+            this.level = level;
+            fillBalls();
         }
     }
 
-    public void setBoardSize(int boardSize) {
-        this.boardSize = boardSize;
+    /**
+     * Constructor that starts a new game, changing only the opening player
+     * from before.
+     *
+     * @param oldOpeningPlayer opening player of game before(standard is HUMAN).
+     */
+    public AbaloneGame(Player oldOpeningPlayer, int oldSize, int level) {
+        Player newOpener = (oldOpeningPlayer == Player.HUMAN) ? Player.MACHINE
+                                                              : Player.HUMAN;
+        boardSize = oldSize;
+        this.level = level;
+        fillBalls();
     }
 
-    public void setOpeningPLayer(Player openingPLayer) {
-        this.openingPLayer = openingPLayer;
-    }
-
-    public void setCurrentPlayer(Player currentPlayer) {
-        this.currentPlayer = currentPlayer;
-    }
-
-    public void setHumanColor(Color humanColor) {
-        this.humanColor = humanColor;
-    }
-
-    public void setBalls(Ball[][] balls) {
-        this.balls = balls;
-    }
-
-    public void setBlackBalls(LinkedList<Ball> blackBalls) {
-        this.blackBalls = blackBalls;
-    }
-
-    public void setWhiteBalls(LinkedList<Ball> whiteBalls) {
-        this.whiteBalls = whiteBalls;
-    }
-
-    public void setWhiteBallsLost(int whiteBallsLost) {
-        this.whiteBallsLost = whiteBallsLost;
-    }
-
-    public void setBlackBallsLost(int blackBallsLost) {
-        this.blackBallsLost = blackBallsLost;
-    }
 
     /**
      * {@inheritDoc}
@@ -92,7 +65,7 @@ public class AbaloneGame implements Board, Cloneable {
      */
     @Override
     public Color getHumanColor() {
-        return humanColor;
+        return (getOpeningPlayer() == Player.HUMAN) ? Color.BLACK : Color.WHITE;
     }
 
     /**
@@ -108,7 +81,14 @@ public class AbaloneGame implements Board, Cloneable {
      */
     @Override
     public boolean isValidPosition(int row, int diag) {
-
+        if (0 <= row && row < boardSize
+                && Math.max(0, row - Math.floorDiv(boardSize, 2)) <= diag
+                && diag <= Math.min(
+                            row + Math.floorDiv(boardSize, 2), boardSize - 1)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -140,7 +120,11 @@ public class AbaloneGame implements Board, Cloneable {
      */
     @Override
     public void setLevel(int level) {
-
+        if (level < 1) {
+            throw new IllegalArgumentException("Level needs to be above 0.");
+        } else {
+            this.level = level;
+        }
     }
 
     /**
@@ -164,7 +148,13 @@ public class AbaloneGame implements Board, Cloneable {
      */
     @Override
     public int getNumberOfBalls(Color color) {
-        return 0;
+        if (color == Color.NONE) {
+            throw new IllegalArgumentException("There are no balls with color"
+                    + " NONE.");
+        } else {
+            return (color == Color.BLACK) ? blackBalls.size()
+                                          : whiteBalls.size();
+        }
     }
 
     /**
@@ -172,7 +162,8 @@ public class AbaloneGame implements Board, Cloneable {
      */
     @Override
     public Color getSlot(int row, int diag) {
-        return null;
+        return (balls[row][diag] == null) ? Color.NONE
+                                          : balls[row][diag].getColor();
     }
 
     /**
@@ -185,13 +176,12 @@ public class AbaloneGame implements Board, Cloneable {
 
     @Override
     public AbaloneGame clone() {
-        AbaloneGame clone = new AbaloneGame();
-        clone.setBoardSize(getSize());
-        clone.setOpeningPLayer(openingPLayer);
-        clone.setCurrentPlayer(currentPlayer);
-        clone.setLevel(level);
-        clone.setWhiteBallsLost(whiteBallsLost);
-        clone.setBlackBallsLost(blackBallsLost);
+        AbaloneGame clone = new AbaloneGame(level);
+        clone.boardSize = boardSize;
+        clone.openingPLayer = openingPLayer;
+        clone.currentPlayer = currentPlayer;
+        clone.whiteBallsLost = whiteBallsLost;
+        clone.blackBallsLost = blackBallsLost;
         Ball[][] ballsClone = new Ball[boardSize][boardSize];
         LinkedList<Ball> clBlackB = new LinkedList<>();
         for (Ball ball : blackBalls) {
@@ -205,9 +195,42 @@ public class AbaloneGame implements Board, Cloneable {
             ballsClone[ball.getRow()][ball.getDiag()] =
                     ballsClone[ball.getRow()][ball.getDiag()].clone();
         }
-        clone.setBalls(ballsClone);
-        clone.setBlackBalls(clBlackB);
-        clone.setWhiteBalls(clWhiteB);
+        clone.balls = ballsClone;
+        clone.blackBalls = clBlackB;
+        clone.whiteBalls = clWhiteB;
         return clone;
+    }
+
+    private void fillBalls() {
+        Color machineColor = (getHumanColor() == Color.BLACK) ? Color.WHITE
+                                                              : Color.BLACK;
+        int flooredHalf = Math.floorDiv(boardSize, 2);
+        for (int row = 0; row < 2; row++) {
+            for (int diag = 0; diag < flooredHalf; diag++) {
+                blackBalls.addFirst(new Ball(
+                        Player.HUMAN, getHumanColor(), row, diag));
+                whiteBalls.addFirst(
+                        new Ball(Player.MACHINE, machineColor,
+                                boardSize - (row + 1),
+                                boardSize - diag));
+            }
+        }
+        for (int diag = 2; diag < flooredHalf - 2; diag++) {
+            blackBalls.addFirst(new Ball(
+                    Player.HUMAN, getHumanColor(), 2, diag));
+            whiteBalls.addFirst(
+                    new Ball(Player.MACHINE, machineColor,
+                            boardSize - 3, boardSize - diag));
+        }
+        fillBallsArray();
+    }
+
+    private void fillBallsArray() {
+        for (Ball ball : blackBalls) {
+            balls[ball.getRow()][ball.getDiag()] = ball;
+        }
+        for (Ball ball : whiteBalls) {
+            balls[ball.getRow()][ball.getDiag()] = ball;
+        }
     }
 }

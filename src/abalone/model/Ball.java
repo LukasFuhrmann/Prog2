@@ -13,7 +13,7 @@ public class Ball implements Cloneable {
     public Ball() {
     }
 
-    public Ball(Player currentP, Color color, int diag, int row) {
+    public Ball(Player currentP, Color color, int row, int diag) {
         this.currentPlayer = currentP;
         this.color = color;
         this.diag = diag;
@@ -58,7 +58,7 @@ public class Ball implements Cloneable {
 
     @Override
     public Ball clone() {
-        return new Ball(currentPlayer, color, diag, row);
+        return new Ball(currentPlayer, color, row, diag);
     }
 
 }

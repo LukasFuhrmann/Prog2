@@ -17,9 +17,10 @@ import java.util.Scanner;
  */
 public final class Shell {
 
-    private static Board game = new AbaloneGame();
     private static final String ERROR = "Error! ";
     private static final String PROMPT = "abalone> ";
+    private static int LEVEL = 2;
+    private static Board GAME = new AbaloneGame(LEVEL);
 
     private Shell() {
     }
@@ -76,7 +77,7 @@ public final class Shell {
                     numbersOfBalls();
                     break;
                 case 'P':
-                    System.out.println(game);
+                    System.out.println(GAME);
                     break;
                 case 'L':
                     changeLevel(scanner);
@@ -111,10 +112,10 @@ public final class Shell {
         try {
             int level = parseScannerInt(scanner);
             if (level <= 0) {
-                throw new IllegalArgumentException("Difficult level has to be"
+                throw new IllegalArgumentException("Difficulty level has to be"
                         + " higher than 0.");
             } else {
-                game.setLevel(level);
+                GAME.setLevel(level);
             }
         } catch (IllegalArgumentException e) {
             error(e.getMessage());
@@ -122,7 +123,7 @@ public final class Shell {
     }
 
     private static void switchOpener() {
-        game = new AbaloneGame(game.getOpeningPlayer());
+        GAME = new AbaloneGame(GAME.getOpeningPlayer(), GAME.getSize(), LEVEL);
     }
 
     private static void numbersOfBalls() {
@@ -132,11 +133,11 @@ public final class Shell {
         try {
             int fromRow = parseScannerInt(scanner);
             int fromDiag = parseScannerInt(scanner);
-            if (game.isValidPosition(fromRow, fromDiag)) {
+            if (GAME.isValidPosition(fromRow - 1, fromDiag - 1)) {
                 int toRow = parseScannerInt(scanner);
                 int toDiag = parseScannerInt(scanner);
-                if (game.isValidTarget(toRow, toDiag)) {
-                    game.move(fromRow, fromDiag, toRow, toDiag);
+                if (GAME.isValidTarget(toRow - 1, toDiag - 1)) {
+                    GAME.move(fromRow - 1, fromDiag - 1, toRow - 1, toDiag - 1);
                 } else {
                     throw new IllegalArgumentException("Illegal target "
                             + "coordinates.");
@@ -153,10 +154,12 @@ public final class Shell {
     private static void startNewGame(Scanner scanner) {
         try {
             int size = parseScannerInt(scanner);
-            if (size < game.MIN_SIZE) {
+            if (size < GAME.MIN_SIZE) {
                 throw new IllegalArgumentException("Board size too small.");
+            } else if (size % 2 == 0) {
+                throw new IllegalArgumentException("Board size needs be odd.");
             } else {
-                game = new AbaloneGame(size);
+                GAME = new AbaloneGame(size, GAME.getOpeningPlayer(), LEVEL);
             }
         } catch (IllegalArgumentException e) {
             error(e.getMessage());
@@ -164,18 +167,6 @@ public final class Shell {
     }
 
     private static void help() {
-        System.out.println("HELP: Here will you find all available commands. ");
-        System.out.println("NOTE: You only need the first letter of a command"
-                + " and the case sensitivity is ignored.");
-        System.out.println("<NEW>          : Creates a new field.");
-        System.out.println("<PRINT>        : Prints out all points in current"
-                + " field.");
-        System.out.println("<ADD><X><Y>    : Adds the point (X, Y) to the "
-                + "field. Only integers are allowed for X,Y.");
-        System.out.println("<REMOVE><X><Y> : Removes the point (X, Y) from "
-                + "the field. Only integers are allowed for X,Y.");
-        System.out.println();
-        System.out.println("<QUIT>         : Ends the program.");
     }
 
     private static void error(String err) {
