@@ -116,6 +116,7 @@ public final class Shell {
                 throw new IllegalArgumentException("Difficulty level has to be"
                         + " higher than 0.");
             } else {
+                LEVEL=level;
                 GAME.setLevel(level);
             }
         } catch (IllegalArgumentException e) {
@@ -170,6 +171,25 @@ public final class Shell {
     }
 
     private static void help() {
+        System.out.println("This game is a variation of the game Abalone by "
+                + "Michel Lalet and Laurent Lévi.");
+        System.out.println("Here is a short "
+                + "description of all the commands you can use.");
+        System.out.println("Note: You only need the first letter of a command"
+                + " and the case sensitivity is ignored.");
+        System.out.println("<NEW> <boardSize>           : Starts new game with "
+                + "a <boardSize> big game board.");
+        System.out.println("<SWITCH>                    : Starts a new game "
+                + "with switched colors.");
+        System.out.println("<PRINT>                     : Prints the game "
+                + "board.");
+        System.out.println("<LEVEL> <newLevel>          : Changes the game "
+                + "difficulty to <newLevel>.");
+        System.out.println("<MOVE> <r1> <d1> <r2> <d2>  : Moves ball from "
+                + "<r1> <d1> to <r2>< d2>.");
+        System.out.println("<BALLS>                     : Returns number of  "
+                + "black and white balls.");
+        System.out.println("<QUIT>                      : Ends the program.");
     }
 
     private static void error(String err) {

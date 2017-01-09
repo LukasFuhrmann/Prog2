@@ -57,8 +57,8 @@ public class Ball implements Cloneable {
     }
 
     @Override
-    public Ball clone() {
-        return new Ball(currentPlayer, color, row, diag);
+    public Ball clone() throws CloneNotSupportedException {
+        return (Ball) super.clone();
     }
 
     @Override
