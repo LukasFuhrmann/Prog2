@@ -2,6 +2,7 @@ package abalone;
 
 import abalone.model.AbaloneGame;
 import abalone.model.Board;
+import abalone.model.Color;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -127,6 +128,8 @@ public final class Shell {
     }
 
     private static void numbersOfBalls() {
+        System.out.println("X: " + GAME.getNumberOfBalls(Color.BLACK));
+        System.out.println("O: " + GAME.getNumberOfBalls(Color.BLACK));
     }
 
     private static void checkMove(Scanner scanner) {
@@ -154,7 +157,7 @@ public final class Shell {
     private static void startNewGame(Scanner scanner) {
         try {
             int size = parseScannerInt(scanner);
-            if (size < GAME.MIN_SIZE) {
+            if (size < Board.MIN_SIZE) {
                 throw new IllegalArgumentException("Board size too small.");
             } else if (size % 2 == 0) {
                 throw new IllegalArgumentException("Board size needs be odd.");

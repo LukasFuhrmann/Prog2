@@ -9,11 +9,12 @@ import java.util.LinkedList;
 public class AbaloneGame implements Board, Cloneable {
 
     private int boardSize = 9;
+    private int halfBSize = Math.floorDiv(boardSize, 2);
     private Player openingPLayer = Player.HUMAN;
     private Player currentPlayer = Player.HUMAN;
     private Ball[][] balls;
-    private LinkedList<Ball> blackBalls;
-    private LinkedList<Ball> whiteBalls;
+    private LinkedList<Ball> blackBalls = new LinkedList<>();
+    private LinkedList<Ball> whiteBalls = new LinkedList<>();
     private int whiteBallsLost = 0;
     private int blackBallsLost = 0;
     private int level;
@@ -32,7 +33,9 @@ public class AbaloneGame implements Board, Cloneable {
             openingPLayer = oldOpeningPLayer;
             currentPlayer = openingPLayer;
             boardSize = size;
+            halfBSize = Math.floorDiv(boardSize, 2);
             this.level = level;
+            balls = new Ball[boardSize][boardSize];
             fillBalls();
         }
     }
@@ -47,7 +50,9 @@ public class AbaloneGame implements Board, Cloneable {
         Player newOpener = (oldOpeningPlayer == Player.HUMAN) ? Player.MACHINE
                                                               : Player.HUMAN;
         boardSize = oldSize;
+        halfBSize = Math.floorDiv(boardSize, 2);
         this.level = level;
+        balls = new Ball[boardSize][boardSize];
         fillBalls();
     }
 
@@ -81,14 +86,7 @@ public class AbaloneGame implements Board, Cloneable {
      */
     @Override
     public boolean isValidPosition(int row, int diag) {
-        if (0 <= row && row < boardSize
-                && Math.max(0, row - Math.floorDiv(boardSize, 2)) <= diag
-                && diag <= Math.min(
-                            row + Math.floorDiv(boardSize, 2), boardSize - 1)) {
-            return true;
-        } else {
-            return false;
-        }
+        return isValidPosOnSize(row, diag, boardSize);
     }
 
     /**
@@ -96,7 +94,18 @@ public class AbaloneGame implements Board, Cloneable {
      */
     @Override
     public boolean isValidTarget(int row, int diag) {
-        return false;
+        return isValidPosOnSize(row, diag, boardSize + 1);
+    }
+
+    private boolean isValidPosOnSize(int row, int diag, int boardSize) {
+        if (0 <= row && row < boardSize
+                && Math.max(0, row - halfBSize) <= diag
+                && diag <= Math.min(
+                row + Math.floorDiv(boardSize, 2), boardSize - 1)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -175,6 +184,32 @@ public class AbaloneGame implements Board, Cloneable {
     }
 
     @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        for (int row = boardSize - 1; row >= 0; row--) {
+            for (int firstD = Math.abs(row - halfBSize);
+                 firstD > 0; firstD--) {
+                result.append(" ");
+            }
+            for (int diag = Math.max(row - halfBSize,0);
+                 diag <= Math.min(row + halfBSize, boardSize - 1); diag++) {
+                Ball ball = balls[row][diag];
+                if (ball == null) {
+                    result.append(".");
+                } else {
+                    result.append(ball.toString());
+                }
+                result.append(" ");
+            }
+            result.deleteCharAt(result.length()-1);
+            if (row!=0) {
+            result.append(System.lineSeparator());
+            }
+        }
+        return result.toString();
+    }
+
+    @Override
     public AbaloneGame clone() {
         AbaloneGame clone = new AbaloneGame(level);
         clone.boardSize = boardSize;
@@ -204,26 +239,35 @@ public class AbaloneGame implements Board, Cloneable {
     private void fillBalls() {
         Color machineColor = (getHumanColor() == Color.BLACK) ? Color.WHITE
                                                               : Color.BLACK;
-        int flooredHalf = Math.floorDiv(boardSize, 2);
+        LinkedList topBallsList = new LinkedList();
+        LinkedList botBallsList = new LinkedList();
         for (int row = 0; row < 2; row++) {
-            for (int diag = 0; diag < flooredHalf; diag++) {
-                blackBalls.addFirst(new Ball(
+            for (int diag = 0; diag <= halfBSize + row; diag++) {
+                botBallsList.add(new Ball(
                         Player.HUMAN, getHumanColor(), row, diag));
-                whiteBalls.addFirst(
+                topBallsList.add(
                         new Ball(Player.MACHINE, machineColor,
                                 boardSize - (row + 1),
-                                boardSize - diag));
+                                boardSize - (diag + 1)));
             }
         }
-        for (int diag = 2; diag < flooredHalf - 2; diag++) {
-            blackBalls.addFirst(new Ball(
+        for (int diag = 2; diag <= halfBSize; diag++) {
+            botBallsList.add(new Ball(
                     Player.HUMAN, getHumanColor(), 2, diag));
-            whiteBalls.addFirst(
+            topBallsList.add(
                     new Ball(Player.MACHINE, machineColor,
-                            boardSize - 3, boardSize - diag));
+                            boardSize - 3, boardSize - (diag + 1)));
+        }
+        if (openingPLayer == Player.HUMAN) {
+            blackBalls = botBallsList;
+            whiteBalls = topBallsList;
+        } else {
+            blackBalls = topBallsList;
+            whiteBalls = botBallsList;
         }
         fillBallsArray();
     }
+
 
     private void fillBallsArray() {
         for (Ball ball : blackBalls) {

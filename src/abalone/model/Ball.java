@@ -61,4 +61,9 @@ public class Ball implements Cloneable {
         return new Ball(currentPlayer, color, row, diag);
     }
 
+    @Override
+    public String toString() {
+        return color.toString();
+    }
+
 }
