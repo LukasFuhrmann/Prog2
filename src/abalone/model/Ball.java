@@ -5,7 +5,7 @@ package abalone.model;
  */
 public class Ball implements Cloneable {
 
-    private Player currentPlayer;
+    private Player player;
     private Color color;
     private int diag;
     private int row;
@@ -13,19 +13,19 @@ public class Ball implements Cloneable {
     public Ball() {
     }
 
-    public Ball(Player currentP, Color color, int row, int diag) {
-        this.currentPlayer = currentP;
+    public Ball(Player player, Color color, int row, int diag) {
+        this.player = player;
         this.color = color;
         this.diag = diag;
         this.row = row;
     }
 
-    public Player getCurrentPlayer() {
-        return currentPlayer;
+    public Player getPlayer() {
+        return player;
     }
 
-    public void setCurrentPlayer(Player currentPlayer) {
-        this.currentPlayer = currentPlayer;
+    public void setPlayer(Player player) {
+        this.player = player;
     }
 
     public Color getColor() {
@@ -40,8 +40,8 @@ public class Ball implements Cloneable {
         return diag;
     }
 
-    public void setDiag(int diag1) {
-        this.diag = diag1;
+    public void setDiag(int diag) {
+        this.diag = diag;
     }
 
     public int getDiag2(int size) {
@@ -58,7 +58,12 @@ public class Ball implements Cloneable {
 
     @Override
     public Ball clone() throws CloneNotSupportedException {
-        return (Ball) super.clone();
+        try {
+            return  (Ball) super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override

@@ -116,7 +116,7 @@ public final class Shell {
                 throw new IllegalArgumentException("Difficulty level has to be"
                         + " higher than 0.");
             } else {
-                LEVEL=level;
+                LEVEL = level;
                 GAME.setLevel(level);
             }
         } catch (IllegalArgumentException e) {
@@ -141,7 +141,15 @@ public final class Shell {
                 int toRow = parseScannerInt(scanner);
                 int toDiag = parseScannerInt(scanner);
                 if (GAME.isValidTarget(toRow - 1, toDiag - 1)) {
-                    GAME.move(fromRow - 1, fromDiag - 1, toRow - 1, toDiag - 1);
+                    Board save = GAME;
+                    GAME = GAME.move(fromRow - 1, fromDiag - 1,
+                            toRow - 1, toDiag - 1);
+                    if (GAME!= null) {
+                        System.out.println(GAME);
+                    } else {
+                        GAME = save;
+                        throw new IllegalArgumentException("Illegal move.");
+                    }
                 } else {
                     throw new IllegalArgumentException("Illegal target "
                             + "coordinates.");
@@ -152,6 +160,18 @@ public final class Shell {
             }
         } catch (IllegalArgumentException e) {
             error(e.getMessage());
+        }
+    }
+
+    private static void makeMove(int fromRow, int fromDiag,
+                                 int toRow, int toDiag) {
+        if (GAME.move(fromRow - 1, fromDiag - 1, toRow - 1, toDiag - 1)
+                != null) {
+            GAME = GAME.move(fromRow - 1, fromDiag - 1, toRow - 1, toDiag - 1);
+            GAME.getNextPlayer();
+            System.out.println(GAME);
+        } else {
+            throw new IllegalArgumentException("Illegal move.");
         }
     }
 
