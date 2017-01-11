@@ -151,10 +151,11 @@ public class AbaloneGame implements Board, Cloneable {
             if (!isValidPosition(rowTo, diagTo)
                     && isValidTarget(rowTo, diagTo)) {
                 removeElim(clone, rowTo - rowD, diagTo - diagD);
+                --ballCount;
             }
-            while (ballCount > 0 && (isValidPosition(rowTo, diagTo)
-                    || ballCount != 1)) {
-                changeBallCoor(clone, rowTo, rowD, diagTo, diagD, ballCount);
+            while (ballCount >0 ) {
+                changeBallCoor(clone, rowFrom, rowD, diagFrom, diagD,
+                        ballCount-1);
                 --ballCount;
             }
             clone.balls[rowFrom][diagFrom] = null;
@@ -175,15 +176,13 @@ public class AbaloneGame implements Board, Cloneable {
         }
     }
 
-    private void changeBallCoor(AbaloneGame clone, int rowTo, int rowD,
-                                int diagTo, int diagD, int ballCount) {
-        int origR = rowTo - rowD * ballCount;
-        int origD = diagTo - diagD * ballCount;
-        clone.getBall(origR, origD).setRow(origR + rowD);
-        clone.getBall(origR, origD).setDiag(origD + diagD);
-        if (clone.getBall(origR, origD) != null) {
-            clone.setBall(origR + rowD, origD + diagD, balls[origR][origD]);
-        }
+    private void changeBallCoor(AbaloneGame clone, int rowFrom, int rowD,
+                                int diagFrom, int diagD, int pos) {
+        int origR = rowFrom + rowD * pos ;
+        int origD = diagFrom + diagD * pos ;
+        clone.setBall(origR + rowD, origD + diagD, clone.balls[origR][origD]);
+        clone.getBall(origR+ rowD, origD+ diagD).setRow(origR + rowD);
+        clone.getBall(origR+ rowD, origD+ diagD).setDiag(origD + diagD);
     }
 
     private Ball getBall(int row, int diag) {
@@ -325,8 +324,10 @@ public class AbaloneGame implements Board, Cloneable {
                 clWhiteB.add(ballCl);
                 clone.balls[ball.getRow()][ball.getDiag()] = ballCl;
             }
-            clone.blackBalls = clBlackB;
-            clone.whiteBalls = clWhiteB;
+            clone.blackBalls.clear();
+            clone.whiteBalls.clear();
+            clone.blackBalls.addAll(clBlackB);
+            clone.whiteBalls.addAll(clWhiteB);
             return clone;
         } catch (CloneNotSupportedException e) {
             e.printStackTrace();
@@ -356,11 +357,11 @@ public class AbaloneGame implements Board, Cloneable {
                             boardSize - 3, boardSize - (diag + 1)));
         }
         if (openingPLayer == Player.HUMAN) {
-            blackBalls = botBallsList;
-            whiteBalls = topBallsList;
+            blackBalls.addAll(botBallsList);
+            whiteBalls.addAll(topBallsList);
         } else {
-            blackBalls = topBallsList;
-            whiteBalls = botBallsList;
+            blackBalls.addAll(topBallsList);
+            whiteBalls.addAll(botBallsList);
         }
         fillBallsArray();
     }
@@ -376,12 +377,19 @@ public class AbaloneGame implements Board, Cloneable {
     }
 
     public static void main(String[] args) {
-        AbaloneGame game = new AbaloneGame(7, Player.HUMAN, 2);
+        AbaloneGame game = new AbaloneGame(2);
+        game = (AbaloneGame) game.move(0, 1, 1, 2);
+        System.out.println(game);
         game = (AbaloneGame) game.move(1, 2, 2, 3);
         System.out.println(game);
         game = (AbaloneGame) game.move(2, 3, 3, 4);
         System.out.println(game);
         game = (AbaloneGame) game.move(3, 4, 4, 5);
         System.out.println(game);
+        game = (AbaloneGame) game.move(4, 5, 5, 6);
+        System.out.println(game);
+        game = (AbaloneGame) game.move(7, 8, 6, 7);
+        System.out.println(game);
+
     }
 }

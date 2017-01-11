@@ -40,8 +40,8 @@ public class Ball implements Cloneable {
         return diag;
     }
 
-    public void setDiag(int diag) {
-        this.diag = diag;
+    public void setDiag(int neWdiag) {
+        this.diag = neWdiag;
     }
 
     public int getDiag2(int size) {
@@ -52,8 +52,8 @@ public class Ball implements Cloneable {
         return row;
     }
 
-    public void setRow(int row) {
-        this.row = row;
+    public void setRow(int neWrow) {
+        this.row = neWrow;
     }
 
     @Override
@@ -71,4 +71,25 @@ public class Ball implements Cloneable {
         return color.toString();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Ball ball = (Ball) o;
+
+        if (diag != ball.diag) return false;
+        if (row != ball.row) return false;
+        if (player != ball.player) return false;
+        return color == ball.color;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = player.hashCode();
+        result = 31 * result + color.hashCode();
+        result = 31 * result + diag;
+        result = 31 * result + row;
+        return result;
+    }
 }
