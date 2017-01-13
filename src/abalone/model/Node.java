@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * Implements a tree structure for {@code machineMove()} to calculate the
- * move for the machin.
+ * move for the machine.
  */
 public class Node implements Comparable {
 
@@ -21,12 +21,6 @@ public class Node implements Comparable {
 
     Node(Board game) {
         this.game = game;
-    }
-
-    public Node(Node child, Board game, double score) {
-        children.add(child);
-        this.game = game;
-        this.score = score;
     }
 
     Board getGame() {

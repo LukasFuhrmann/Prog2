@@ -20,8 +20,8 @@ public final class Shell {
 
     private static final String ERROR = "Error! ";
     private static final String PROMPT = "abalone> ";
-    private static int LEVEL = 2;
-    private static Board GAME = new AbaloneGame(LEVEL);
+    private static int level = 2;
+    private static Board game = new AbaloneGame(level);
 
     private Shell() {
     }
@@ -78,7 +78,7 @@ public final class Shell {
                     numbersOfBalls();
                     break;
                 case 'P':
-                    System.out.println(GAME);
+                    System.out.println(game);
                     break;
                 case 'L':
                     changeLevel(scanner);
@@ -116,8 +116,8 @@ public final class Shell {
                 throw new IllegalArgumentException("Difficulty level has to be"
                         + " higher than 0.");
             } else {
-                LEVEL = level;
-                GAME.setLevel(level);
+                Shell.level = level;
+                game.setLevel(level);
             }
         } catch (IllegalArgumentException e) {
             error(e.getMessage());
@@ -125,26 +125,26 @@ public final class Shell {
     }
 
     private static void switchOpener() {
-        GAME = new AbaloneGame(GAME.getOpeningPlayer(), GAME.getSize(), LEVEL);
+        game = new AbaloneGame(game.getOpeningPlayer(), game.getSize(), level);
         newGame();
-        if (GAME.getOpeningPlayer() == Player.MACHINE) {
+        if (game.getOpeningPlayer() == Player.MACHINE) {
             machineM();
         }
     }
 
     private static void numbersOfBalls() {
-        System.out.println("X: " + GAME.getNumberOfBalls(Color.BLACK));
-        System.out.println("O: " + GAME.getNumberOfBalls(Color.BLACK));
+        System.out.println("X: " + game.getNumberOfBalls(Color.BLACK));
+        System.out.println("O: " + game.getNumberOfBalls(Color.WHITE));
     }
 
     private static void checkMove(Scanner scanner) {
         try {
             int fromRow = parseScannerInt(scanner);
             int fromDiag = parseScannerInt(scanner);
-            if (GAME.isValidPosition(fromRow - 1, fromDiag - 1)) {
+            if (game.isValidPosition(fromRow - 1, fromDiag - 1)) {
                 int toRow = parseScannerInt(scanner);
                 int toDiag = parseScannerInt(scanner);
-                if (GAME.isValidTarget(toRow - 1, toDiag - 1)) {
+                if (game.isValidTarget(toRow - 1, toDiag - 1)) {
                     makeMove(fromRow - 1, fromDiag - 1, toRow - 1, toDiag - 1);
                 } else {
                     throw new IllegalArgumentException("Illegal target "
@@ -161,31 +161,31 @@ public final class Shell {
 
     private static void makeMove(int fromRow, int fromDiag, int toRow,
                                  int toDiag) {
-        Board save = GAME;
-        GAME = GAME.move(fromRow, fromDiag, toRow, toDiag);
-        if (GAME != null) {
-            if (GAME.isGameOver()) {
+        Board save = game;
+        game = game.move(fromRow, fromDiag, toRow, toDiag);
+        if (game != null) {
+            if (game.isGameOver()) {
                 isOver();
-            } else if (GAME.getNextPlayer() == Player.HUMAN) {
+            } else if (game.getNextPlayer() == Player.HUMAN) {
                 System.out.println("I must skip (no possible moves).");
             } else {
                 machineM();
             }
         } else {
-            GAME = save;
+            game = save;
             throw new IllegalArgumentException("Illegal move.");
         }
     }
 
     private static void machineM() {
-        GAME = GAME.machineMove();
-        if (GAME.isGameOver()) {
+        game = game.machineMove();
+        if (game.isGameOver()) {
             isOver();
         } else {
-            while (GAME.getNextPlayer() == Player.MACHINE) {
-                GAME = GAME.machineMove();
+            while (game.getNextPlayer() == Player.MACHINE) {
+                game = game.machineMove();
                 System.out.println("You must skip (no possible moves).");
-                if (GAME.isGameOver()) {
+                if (game.isGameOver()) {
                     isOver();
                     break;
                 }
@@ -194,7 +194,7 @@ public final class Shell {
     }
 
     private static void isOver() {
-        if (GAME.getWinner() == Player.HUMAN) {
+        if (game.getWinner() == Player.HUMAN) {
             System.out.println("Congratulations! You won.");
         } else {
             System.out.println("Sorry! Machine wins");
@@ -209,9 +209,9 @@ public final class Shell {
             } else if (size % 2 == 0) {
                 throw new IllegalArgumentException("Board size needs be odd.");
             } else {
-                GAME = new AbaloneGame(size, GAME.getOpeningPlayer(), LEVEL);
+                game = new AbaloneGame(size, game.getOpeningPlayer(), level);
                 newGame();
-                if (GAME.getOpeningPlayer() == Player.MACHINE) {
+                if (game.getOpeningPlayer() == Player.MACHINE) {
                     machineM();
                 }
             }
@@ -247,7 +247,7 @@ public final class Shell {
     }
 
     private static void newGame() {
-        System.out.println("New game started. You are " + GAME.getHumanColor()
+        System.out.println("New game started. You are " + game.getHumanColor()
                 + ".");
     }
 }

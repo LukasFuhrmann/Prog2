@@ -62,6 +62,8 @@ public class AbaloneGame implements Board, Cloneable {
      * from before.
      *
      * @param oldOpeningPlayer opening player of game before(standard is HUMAN).
+     * @param oldSize          old size of the board.
+     * @param level            difficulty of the AI
      */
     public AbaloneGame(Player oldOpeningPlayer, int oldSize, int level) {
         openingPLayer = (oldOpeningPlayer == Player.HUMAN) ? Player.MACHINE
@@ -108,13 +110,9 @@ public class AbaloneGame implements Board, Cloneable {
      */
     @Override
     public boolean isValidPosition(int row, int diag) {
-        if (0 <= row && row < boardSize
+        return 0 <= row && row < boardSize
                 && Math.max(0, row - halfBSize) <= diag
-                && diag <= Math.min(row + halfBSize, boardSize - 1)) {
-            return true;
-        } else {
-            return false;
-        }
+                && diag <= Math.min(row + halfBSize, boardSize - 1);
     }
 
     /**
@@ -122,13 +120,9 @@ public class AbaloneGame implements Board, Cloneable {
      */
     @Override
     public boolean isValidTarget(int row, int diag) {
-        if (-1 <= row && row <= boardSize
+        return -1 <= row && row <= boardSize
                 && Math.max(0, row - halfBSize) <= diag + 1
-                && diag - 1 <= Math.min(row + halfBSize, boardSize - 1)) {
-            return true;
-        } else {
-            return false;
-        }
+                && diag - 1 <= Math.min(row + halfBSize, boardSize - 1);
     }
 
 
@@ -407,8 +401,8 @@ public class AbaloneGame implements Board, Cloneable {
     }
 
     /**
-     *  Return a string representation of this board similar to the original
-     *  look of Abalone.
+     * Return a string representation of this board similar to the original
+     * look of Abalone.
      *
      * @return string representation of the
      */

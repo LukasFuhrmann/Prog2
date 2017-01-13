@@ -85,17 +85,18 @@ public interface Board {
      *                 player should be moved.
      * @param diagFrom The slot's diagonal number from which the ball of the
      *                 human player should be moved.
-     * @param rowTo    The slot's row number to which the ball of the human player
-     *                 should be moved.
+     * @param rowTo    The slot's row number to which the ball of the human
+     *                 player should be moved.
      * @param diagTo   The slot's diagonal number to which the ball of the human
      *                 player should be moved.
      * @return A new board with the move executed. If the move is not valid,
      * then {@code null} will be returned.
-     * @throws IllegalStateException    If the game is already over, or it is not
-     *                                  the human's turn.
+     * @throws IllegalStateException    If the game is already over, or it is
+     *                                  not the human's turn.
      * @throws IllegalArgumentException If the provided parameters are invalid,
-     *                                  e.g., the from slot lies outside the grid or the to slot outside
-     *                                  the grid plus an one-element border.
+     *                                  e.g., the from slot lies outside the
+     *                                  grid or the to slot outside the grid
+     *                                  plus an one-element border.
      */
     Board move(int rowFrom, int diagFrom, int rowTo, int diagTo);
 
