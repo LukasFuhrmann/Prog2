@@ -1,10 +1,12 @@
 package abalone.model;
 
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 /**
- *
+ * Implementation of a Abalone inspired game. This class implements the game
+ * logic.
  */
 public class AbaloneGame implements Board, Cloneable {
 
@@ -18,13 +20,28 @@ public class AbaloneGame implements Board, Cloneable {
     private int whiteBallsLost = 0;
     private int blackBallsLost = 0;
     private int level;
+    private static final double WIN_VALUE = 5000000;
+    private static final double HUMAN_VALUE = 1.5;
 
+    /**
+     * Constructor that starts the standard game.
+     *
+     * @param level difficulty of the AI
+     */
     public AbaloneGame(int level) {
         this.level = level;
         balls = new Ball[boardSize][boardSize];
         fillBalls();
     }
 
+    /**
+     * Constructor that starts a new game, changing the size of the board.
+     *
+     * @param size             new size of the board.
+     *                         Must be above {@code MIN_SIZE}.
+     * @param oldOpeningPLayer the opening player of the new game.
+     * @param level            difficulty of the AI
+     */
     public AbaloneGame(int size, Player oldOpeningPLayer, int level) {
         if (size < MIN_SIZE || size % 2 == 0) {
             throw new IllegalArgumentException("Board size has to be odd "
@@ -47,8 +64,9 @@ public class AbaloneGame implements Board, Cloneable {
      * @param oldOpeningPlayer opening player of game before(standard is HUMAN).
      */
     public AbaloneGame(Player oldOpeningPlayer, int oldSize, int level) {
-        Player newOpener = (oldOpeningPlayer == Player.HUMAN) ? Player.MACHINE
-                                                              : Player.HUMAN;
+        openingPLayer = (oldOpeningPlayer == Player.HUMAN) ? Player.MACHINE
+                                                           : Player.HUMAN;
+        currentP = openingPLayer;
         boardSize = oldSize;
         halfBSize = Math.floorDiv(boardSize, 2);
         this.level = level;
@@ -56,6 +74,10 @@ public class AbaloneGame implements Board, Cloneable {
         fillBalls();
     }
 
+
+    private Player getCurrentP() {
+        return currentP;
+    }
 
     /**
      * {@inheritDoc}
@@ -78,7 +100,7 @@ public class AbaloneGame implements Board, Cloneable {
      */
     @Override
     public Player getNextPlayer() {
-        return null;
+        return currentP;
     }
 
     /**
@@ -88,8 +110,7 @@ public class AbaloneGame implements Board, Cloneable {
     public boolean isValidPosition(int row, int diag) {
         if (0 <= row && row < boardSize
                 && Math.max(0, row - halfBSize) <= diag
-                && diag <= Math.min(
-                row + halfBSize, boardSize - 1)) {
+                && diag <= Math.min(row + halfBSize, boardSize - 1)) {
             return true;
         } else {
             return false;
@@ -103,8 +124,7 @@ public class AbaloneGame implements Board, Cloneable {
     public boolean isValidTarget(int row, int diag) {
         if (-1 <= row && row <= boardSize
                 && Math.max(0, row - halfBSize) <= diag + 1
-                && diag - 1 <= Math.min(
-                row + halfBSize, boardSize - 1)) {
+                && diag - 1 <= Math.min(row + halfBSize, boardSize - 1)) {
             return true;
         } else {
             return false;
@@ -117,6 +137,18 @@ public class AbaloneGame implements Board, Cloneable {
      */
     @Override
     public Board move(int rowFrom, int diagFrom, int rowTo, int diagTo) {
+        updateCurrentPlayer();
+        if (!(isValidPosition(rowFrom, diagFrom)
+                || isValidTarget(rowTo, diagTo))) {
+            throw new IllegalArgumentException("Illegal coordinates.");
+        } else if (currentP == Player.MACHINE || isGameOver()) {
+            throw new IllegalStateException();
+        } else {
+            return playerMove(rowFrom, diagFrom, rowTo, diagTo);
+        }
+    }
+
+    private Board playerMove(int rowFrom, int diagFrom, int rowTo, int diagTo) {
         if (balls[rowFrom][diagFrom] == null
                 || balls[rowFrom][diagFrom].getPlayer() != currentP) {
             return null;
@@ -153,13 +185,13 @@ public class AbaloneGame implements Board, Cloneable {
                 removeElim(clone, rowTo - rowD, diagTo - diagD);
                 --ballCount;
             }
-            while (ballCount >0 ) {
+            while (ballCount > 0) {
                 changeBallCoor(clone, rowFrom, rowD, diagFrom, diagD,
-                        ballCount-1);
+                        ballCount - 1);
                 --ballCount;
             }
             clone.balls[rowFrom][diagFrom] = null;
-            //clone.currentP = Player.values()[Math.abs(currentP.ordinal() -1)];
+            clone.currentP = Player.values()[Math.abs(currentP.ordinal() - 1)];
             return clone;
         } else {
             return null;
@@ -178,11 +210,12 @@ public class AbaloneGame implements Board, Cloneable {
 
     private void changeBallCoor(AbaloneGame clone, int rowFrom, int rowD,
                                 int diagFrom, int diagD, int pos) {
-        int origR = rowFrom + rowD * pos ;
-        int origD = diagFrom + diagD * pos ;
-        clone.setBall(origR + rowD, origD + diagD, clone.balls[origR][origD]);
-        clone.getBall(origR+ rowD, origD+ diagD).setRow(origR + rowD);
-        clone.getBall(origR+ rowD, origD+ diagD).setDiag(origD + diagD);
+        int origR = rowFrom + rowD * pos;
+        int origD = diagFrom + diagD * pos;
+        clone.setBall(origR + rowD, origD + diagD,
+                clone.getBall(origR, origD));
+        clone.getBall(origR + rowD, origD + diagD).setRow(origR + rowD);
+        clone.getBall(origR + rowD, origD + diagD).setDiag(origD + diagD);
     }
 
     private Ball getBall(int row, int diag) {
@@ -194,12 +227,12 @@ public class AbaloneGame implements Board, Cloneable {
     }
 
     private void removeElim(AbaloneGame clone, int origR, int origD) {
-        Ball lost = balls[origR][origD];
+        Ball lost = clone.getBall(origR, origD);
         if (lost.getColor() == Color.BLACK) {
-            clone.blackBalls.remove(lost);
+            clone.getBlackBalls().remove(lost);
             ++clone.blackBallsLost;
         } else {
-            clone.whiteBalls.remove(lost);
+            clone.getWhiteBalls().remove(lost);
             ++clone.whiteBallsLost;
         }
         clone.balls[origR][origD] = null;
@@ -210,19 +243,111 @@ public class AbaloneGame implements Board, Cloneable {
      */
     @Override
     public Board machineMove() {
-        return null;
+        updateCurrentPlayer();
+        if (currentP == Player.HUMAN || isGameOver()) {
+            throw new IllegalStateException();
+        } else {
+            Node root = new Node(this);
+            buildGameTree(0, root);
+            return evaluateTree(root, 1).getGame();
+        }
     }
+
+
+    private void buildGameTree(int depth, Node root) {
+        if (depth < level && !root.getGame().isGameOver()) {
+            AbaloneGame game = (AbaloneGame) root.getGame();
+            game.updateCurrentPlayer();
+            if (game.getCurrentP() == openingPLayer) {
+                game.fillPossible(game.getBlackBalls(), root, depth);
+            } else {
+                game.fillPossible(game.getWhiteBalls(), root, depth);
+            }
+        }
+    }
+
+    private void fillPossible(LinkedList<Ball> playerBallList, Node root,
+                              int depth) {
+        int[][] direction =
+                {{0, 1}, {1, 1}, {1, 0}, {0, -1}, {-1, -1}, {-1, 0}};
+        for (Ball ball : playerBallList) {
+            for (int i = 0; i < 6; i++) {
+                AbaloneGame move = (AbaloneGame) playerMove(ball.getRow(),
+                        ball.getDiag(), ball.getRow() + direction[i][0],
+                        ball.getDiag() + direction[i][1]);
+                if (move != null) {
+                    Node child = new Node(move, move.valueBoard(depth));
+                    root.addChild(child);
+                    move.buildGameTree(depth + 1, child);
+                }
+            }
+        }
+    }
+
+    private double valueBoard(int depth) {
+        double valueHu = 0;
+        double valueMa = 0;
+        if (isGameOver() && getWinner() == Player.HUMAN) {
+            valueHu = WIN_VALUE / depth;
+        } else if (isGameOver() && getWinner() == Player.HUMAN) {
+            valueMa = WIN_VALUE / depth;
+        }
+        double posV = 0;
+        for (int row = 0; row <= halfBSize; row++) {
+            double distRow = Math.min(row, boardSize - (row + 1));
+            for (Ball ball : balls[row]) {
+                if (ball != null) {
+                    double distDia1 = Math.min(ball.getDiag(),
+                            boardSize - (ball.getDiag() + 1));
+                    double distDia2 = Math.min(ball.getDiag2(boardSize),
+                            boardSize - (ball.getDiag2(boardSize) + 1));
+                    double dist = Math.min(
+                            distRow, Math.min(distDia1, distDia2));
+                    posV += (ball.getPlayer() == Player.MACHINE)
+                            ? dist : (-HUMAN_VALUE * dist);
+                }
+            }
+        }
+        double ballVal = getNumberOfBalls(machineColor())
+                - HUMAN_VALUE * getNumberOfBalls(getHumanColor());
+        return boardSize * ballVal + (valueMa - 1.5 * valueHu) + posV;
+    }
+
+    private Node evaluateTree(Node root, int depth) {
+        Node bestOption = root;
+        ArrayList<Node> bucket = new ArrayList<>();
+        for (Node node : root.getChildren()) {
+            bucket.add(evaluateTree(node, depth + 1));
+        }
+        if (bucket.size() > 0) {
+            bestOption = bucket.get(0);
+        }
+        for (Node node : bucket) {
+            if (root.getGame().getNextPlayer() == Player.MACHINE) {
+                bestOption = (node.compareTo(bestOption) <= 0) ? bestOption
+                                                               : node;
+            } else {
+                bestOption = (node.compareTo(bestOption) >= 0) ? bestOption
+                                                               : node;
+            }
+        }
+        if (bestOption != root) {
+            root.setScore(bestOption.getScore() + root.getScore());
+        }
+        if (depth == 1) {
+            return bestOption;
+        } else {
+            return root;
+        }
+    }
+
 
     /**
      * {@inheritDoc}
      */
     @Override
     public void setLevel(int level) {
-        if (level < 1) {
-            throw new IllegalArgumentException("Level needs to be above 0.");
-        } else {
-            this.level = level;
-        }
+        this.level = level;
     }
 
     /**
@@ -242,11 +367,8 @@ public class AbaloneGame implements Board, Cloneable {
             throw new IllegalStateException("Game not over yet.");
         } else if (blackBallsLost >= ELIM) {
             return Player.values()[Math.abs(openingPLayer.ordinal() - 1)];
-        } else if (whiteBallsLost >= ELIM) {
-            return getOpeningPlayer();
         } else {
-            throw new IllegalStateException("Both players lost. This should "
-                    + "not be possible.");
+            return getOpeningPlayer();
         }
     }
 
@@ -255,13 +377,8 @@ public class AbaloneGame implements Board, Cloneable {
      */
     @Override
     public int getNumberOfBalls(Color color) {
-        if (color == Color.NONE) {
-            throw new IllegalArgumentException("There are no balls with color"
-                    + " NONE.");
-        } else {
-            return (color == Color.BLACK) ? blackBalls.size()
-                                          : whiteBalls.size();
-        }
+        return (color == Color.BLACK) ? blackBalls.size()
+                                      : whiteBalls.size();
     }
 
     /**
@@ -273,6 +390,14 @@ public class AbaloneGame implements Board, Cloneable {
                                           : balls[row][diag].getColor();
     }
 
+    private LinkedList<Ball> getBlackBalls() {
+        return blackBalls;
+    }
+
+    private LinkedList<Ball> getWhiteBalls() {
+        return whiteBalls;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -281,6 +406,12 @@ public class AbaloneGame implements Board, Cloneable {
         return boardSize;
     }
 
+    /**
+     *  Return a string representation of this board similar to the original
+     *  look of Abalone.
+     *
+     * @return string representation of the
+     */
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
@@ -307,54 +438,49 @@ public class AbaloneGame implements Board, Cloneable {
         return result.toString();
     }
 
+    /**
+     * Creates deep copy of this game.
+     *
+     * @return deep copy of this object.
+     * @throws CloneNotSupportedException if {@code super} does not implement
+     *                                    clone().
+     */
     @Override
     public AbaloneGame clone() throws CloneNotSupportedException {
-        try {
-            AbaloneGame clone = (AbaloneGame) super.clone();
-            clone.balls = new Ball[clone.boardSize][clone.boardSize];
-            LinkedList<Ball> clBlackB = new LinkedList<>();
-            for (Ball ball : blackBalls) {
-                Ball ballCl = ball.clone();
-                clBlackB.add(ballCl);
-                clone.balls[ball.getRow()][ball.getDiag()] = ballCl;
-            }
-            LinkedList<Ball> clWhiteB = new LinkedList<>();
-            for (Ball ball : whiteBalls) {
-                Ball ballCl = ball.clone();
-                clWhiteB.add(ballCl);
-                clone.balls[ball.getRow()][ball.getDiag()] = ballCl;
-            }
-            clone.blackBalls.clear();
-            clone.whiteBalls.clear();
-            clone.blackBalls.addAll(clBlackB);
-            clone.whiteBalls.addAll(clWhiteB);
-            return clone;
-        } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
-            return null;
+        AbaloneGame clone = (AbaloneGame) super.clone();
+        clone.balls = new Ball[clone.boardSize][clone.boardSize];
+        clone.blackBalls = new LinkedList<>();
+        for (Ball ball : blackBalls) {
+            Ball ballCl = ball.clone();
+            clone.blackBalls.add(ballCl);
+            clone.balls[ball.getRow()][ball.getDiag()] = ballCl;
         }
+        clone.whiteBalls = new LinkedList<>();
+        for (Ball ball : whiteBalls) {
+            Ball ballCl = ball.clone();
+            clone.whiteBalls.add(ballCl);
+            clone.balls[ball.getRow()][ball.getDiag()] = ballCl;
+        }
+        return clone;
     }
 
     private void fillBalls() {
-        Color machineColor = (getHumanColor() == Color.BLACK) ? Color.WHITE
-                                                              : Color.BLACK;
         LinkedList<Ball> topBallsList = new LinkedList<>();
         LinkedList<Ball> botBallsList = new LinkedList<>();
         for (int row = 0; row < 2; row++) {
             for (int diag = 0; diag <= halfBSize + row; diag++) {
                 botBallsList.add(new Ball(
                         Player.HUMAN, getHumanColor(), row, diag));
-                topBallsList.add(new Ball(Player.MACHINE, machineColor,
-                        boardSize - (row + 1),
-                        boardSize - (diag + 1)));
+                topBallsList.add(new Ball(Player.MACHINE, machineColor(),
+                        boardSize - (row + 1), boardSize - (diag + 1)));
             }
         }
-        for (int diag = 2; diag <= halfBSize; diag++) {
+        int thirdRow = 2;
+        for (int diag = thirdRow; diag <= halfBSize; diag++) {
             botBallsList.add(new Ball(
-                    Player.HUMAN, getHumanColor(), 2, diag));
-            topBallsList.add(
-                    new Ball(Player.MACHINE, machineColor,
-                            boardSize - 3, boardSize - (diag + 1)));
+                    Player.HUMAN, getHumanColor(), thirdRow, diag));
+            topBallsList.add(new Ball(Player.MACHINE, machineColor(),
+                    boardSize - (thirdRow + 1), boardSize - (diag + 1)));
         }
         if (openingPLayer == Player.HUMAN) {
             blackBalls.addAll(botBallsList);
@@ -366,7 +492,6 @@ public class AbaloneGame implements Board, Cloneable {
         fillBallsArray();
     }
 
-
     private void fillBallsArray() {
         for (Ball ball : blackBalls) {
             balls[ball.getRow()][ball.getDiag()] = ball;
@@ -376,20 +501,11 @@ public class AbaloneGame implements Board, Cloneable {
         }
     }
 
-    public static void main(String[] args) {
-        AbaloneGame game = new AbaloneGame(2);
-        game = (AbaloneGame) game.move(0, 1, 1, 2);
-        System.out.println(game);
-        game = (AbaloneGame) game.move(1, 2, 2, 3);
-        System.out.println(game);
-        game = (AbaloneGame) game.move(2, 3, 3, 4);
-        System.out.println(game);
-        game = (AbaloneGame) game.move(3, 4, 4, 5);
-        System.out.println(game);
-        game = (AbaloneGame) game.move(4, 5, 5, 6);
-        System.out.println(game);
-        game = (AbaloneGame) game.move(7, 8, 6, 7);
-        System.out.println(game);
+    private Color machineColor() {
+        return (getHumanColor() == Color.BLACK) ? Color.WHITE : Color.BLACK;
+    }
 
+    private void updateCurrentPlayer() {
+        currentP = getNextPlayer();
     }
 }

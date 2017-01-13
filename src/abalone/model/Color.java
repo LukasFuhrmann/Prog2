@@ -1,7 +1,7 @@
 package abalone.model;
 
 /**
- *
+ * Implements the colors of the balls and empty slots.
  */
 public enum Color {
     WHITE('O'),
@@ -14,8 +14,12 @@ public enum Color {
         representation = c;
     }
 
+    /**
+     * @return String representation of this object.
+     */
     @Override
     public String toString() {
         return representation + "";
     }
+
 }

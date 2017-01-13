@@ -3,11 +3,11 @@ package abalone;
 import abalone.model.AbaloneGame;
 import abalone.model.Board;
 import abalone.model.Color;
+import abalone.model.Player;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.IllegalFormatException;
 import java.util.Scanner;
 
 
@@ -126,6 +126,10 @@ public final class Shell {
 
     private static void switchOpener() {
         GAME = new AbaloneGame(GAME.getOpeningPlayer(), GAME.getSize(), LEVEL);
+        newGame();
+        if (GAME.getOpeningPlayer() == Player.MACHINE) {
+            machineM();
+        }
     }
 
     private static void numbersOfBalls() {
@@ -141,15 +145,7 @@ public final class Shell {
                 int toRow = parseScannerInt(scanner);
                 int toDiag = parseScannerInt(scanner);
                 if (GAME.isValidTarget(toRow - 1, toDiag - 1)) {
-                    Board save = GAME;
-                    GAME = GAME.move(fromRow - 1, fromDiag - 1,
-                            toRow - 1, toDiag - 1);
-                    if (GAME!= null) {
-                        System.out.println(GAME);
-                    } else {
-                        GAME = save;
-                        throw new IllegalArgumentException("Illegal move.");
-                    }
+                    makeMove(fromRow - 1, fromDiag - 1, toRow - 1, toDiag - 1);
                 } else {
                     throw new IllegalArgumentException("Illegal target "
                             + "coordinates.");
@@ -163,15 +159,45 @@ public final class Shell {
         }
     }
 
-    private static void makeMove(int fromRow, int fromDiag,
-                                 int toRow, int toDiag) {
-        if (GAME.move(fromRow - 1, fromDiag - 1, toRow - 1, toDiag - 1)
-                != null) {
-            GAME = GAME.move(fromRow - 1, fromDiag - 1, toRow - 1, toDiag - 1);
-            GAME.getNextPlayer();
-            System.out.println(GAME);
+    private static void makeMove(int fromRow, int fromDiag, int toRow,
+                                 int toDiag) {
+        Board save = GAME;
+        GAME = GAME.move(fromRow, fromDiag, toRow, toDiag);
+        if (GAME != null) {
+            if (GAME.isGameOver()) {
+                isOver();
+            } else if (GAME.getNextPlayer() == Player.HUMAN) {
+                System.out.println("I must skip (no possible moves).");
+            } else {
+                machineM();
+            }
         } else {
+            GAME = save;
             throw new IllegalArgumentException("Illegal move.");
+        }
+    }
+
+    private static void machineM() {
+        GAME = GAME.machineMove();
+        if (GAME.isGameOver()) {
+            isOver();
+        } else {
+            while (GAME.getNextPlayer() == Player.MACHINE) {
+                GAME = GAME.machineMove();
+                System.out.println("You must skip (no possible moves).");
+                if (GAME.isGameOver()) {
+                    isOver();
+                    break;
+                }
+            }
+        }
+    }
+
+    private static void isOver() {
+        if (GAME.getWinner() == Player.HUMAN) {
+            System.out.println("Congratulations! You won.");
+        } else {
+            System.out.println("Sorry! Machine wins");
         }
     }
 
@@ -184,6 +210,10 @@ public final class Shell {
                 throw new IllegalArgumentException("Board size needs be odd.");
             } else {
                 GAME = new AbaloneGame(size, GAME.getOpeningPlayer(), LEVEL);
+                newGame();
+                if (GAME.getOpeningPlayer() == Player.MACHINE) {
+                    machineM();
+                }
             }
         } catch (IllegalArgumentException e) {
             error(e.getMessage());
@@ -214,5 +244,10 @@ public final class Shell {
 
     private static void error(String err) {
         System.err.println(ERROR + err);
+    }
+
+    private static void newGame() {
+        System.out.println("New game started. You are " + GAME.getHumanColor()
+                + ".");
     }
 }
