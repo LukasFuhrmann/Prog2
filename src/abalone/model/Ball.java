@@ -65,5 +65,4 @@ public class Ball implements Cloneable {
     public String toString() {
         return color.toString();
     }
-
 }

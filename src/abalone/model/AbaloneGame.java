@@ -247,7 +247,6 @@ public class AbaloneGame implements Board, Cloneable {
         }
     }
 
-
     private void buildGameTree(int depth, Node root) {
         if (depth < level && !root.getGame().isGameOver()) {
             AbaloneGame game = (AbaloneGame) root.getGame();

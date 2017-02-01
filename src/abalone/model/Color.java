@@ -8,10 +8,12 @@ public enum Color {
      * Color of the second player.
      */
     WHITE('O'),
+
     /**
      * Color of the opening player
      */
     BLACK('X'),
+
     /**
      * Color of the slots.
      */
