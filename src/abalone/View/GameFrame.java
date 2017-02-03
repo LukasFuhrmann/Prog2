@@ -8,7 +8,7 @@ import java.awt.*;
  */
 public class GameFrame extends JFrame {
 
-    private JPanel boardPanel = new JPanel();
+    private JPanel boardPanel = new BoardPanel(9);
     private OptionPanel optionPanel = new OptionPanel();
 
     public GameFrame() {

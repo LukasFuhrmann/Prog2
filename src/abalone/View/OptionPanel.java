@@ -47,5 +47,7 @@ class OptionPanel extends JPanel {
         levelName.setFont(new Font("Arial", 0 , 25));
         sizeName.setVisible(true);
         levelName.setVisible(true);
+        level.setSelectedIndex(1);
+        size.setSelectedIndex(1);
     }
 }
