@@ -1,10 +1,17 @@
 package abalone.View;
 
+import abalone.model.*;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
- *
+ *  Implements a panel at the the bottom of the frame which shows the game
+ *  score and gives several options for starting new games, changing the
+ *  level and closing the program.
  */
 class OptionPanel extends JPanel {
 
@@ -41,13 +48,55 @@ class OptionPanel extends JPanel {
         add("Black score", blackScore);
         add("White score", whiteScore);
         whiteScore.setForeground(Color.WHITE);
-        blackScore.setFont(new Font("Arial", 0 , 50));
-        whiteScore.setFont(new Font("Arial", 0 , 50));
-        sizeName.setFont(new Font("Arial", 0 , 25));
-        levelName.setFont(new Font("Arial", 0 , 25));
+        blackScore.setFont(new Font("Arial", 0, 50));
+        whiteScore.setFont(new Font("Arial", 0, 50));
+        sizeName.setFont(new Font("Arial", 0, 25));
+        levelName.setFont(new Font("Arial", 0, 25));
         sizeName.setVisible(true);
         levelName.setVisible(true);
         level.setSelectedIndex(1);
         size.setSelectedIndex(1);
+        addListeners();
+    }
+
+    private void addListeners(){
+        newB.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ((GameFrame) getTopLevelAncestor()).newGame(
+                        size.getItemAt(size.getSelectedIndex()),
+                        level.getItemAt(level.getSelectedIndex()), false);
+            }
+        });
+        switchB.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ((GameFrame) getTopLevelAncestor()).newGame(
+                        size.getItemAt(size.getSelectedIndex()),
+                        level.getItemAt(level.getSelectedIndex()), true);
+
+            }
+        });
+        quitB.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ((GameFrame)getTopLevelAncestor()).dispose();
+            }
+        });
+        level.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ((GameFrame)getTopLevelAncestor()).changeLevel(level
+                        .getItemAt(level.getSelectedIndex()));
+            }
+        });
+    }
+
+
+    void updateScores(Board game) {
+        whiteScore.setText(" " +
+                game.getNumberOfBalls(abalone.model.Color.WHITE) + " ");
+        blackScore.setText(" " +
+                game.getNumberOfBalls(abalone.model.Color.BLACK) + " ");
     }
 }

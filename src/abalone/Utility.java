@@ -3,7 +3,7 @@ package abalone;
 import java.awt.*;
 
 /**
- *
+ * Class implementing several useful methods.
  */
 public class Utility {
 
@@ -46,6 +46,13 @@ public class Utility {
         return Math.min(row + Math.floorDiv(boardSize, 2), boardSize - 1);
     }
 
+    /**
+     * Converts colors of the type {@code abalone.model.Color} into {@code
+     * java.awt.Color}.
+     *
+     * @param color color of the {@code abalone.model.Color} type.
+     * @return respective {@code java.awt.Color} for the input.
+     */
     public static Color parseColor(abalone.model.Color color) {
         if (color != abalone.model.Color.WHITE
                 && color != abalone.model.Color.BLACK) {
@@ -53,6 +60,27 @@ public class Utility {
         } else {
             return (color == abalone.model.Color.WHITE) ? Color.WHITE
                                                         : Color.BLACK;
+        }
+    }
+
+    /**
+     * Checks if the coordinates of a move are in reach for a valid move.
+     *
+     * @param rowFrom  current row of the ball.
+     * @param diagFrom current diagonal coordinate of the ball.
+     * @param rowTo    target row.
+     * @param diagTo   target diagonal.
+     * @return {@code true} if coordinates are next to another, {@code false}
+     * otherwise.
+     */
+    public static boolean isNextTo(int rowFrom, int diagFrom,
+                                   int rowTo, int diagTo) {
+        int row = rowTo - rowFrom;
+        int diag = diagTo - diagFrom;
+        if (Math.abs(row) > 1 || Math.abs(diag) > 1) {
+            return false;
+        } else {
+            return !((row == 0 && diag == 0) || (diag * row == -1));
         }
     }
 }

@@ -1,6 +1,8 @@
 package abalone.model;
 
 
+import abalone.Utility;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -146,7 +148,7 @@ public class AbaloneGame implements Board, Cloneable {
         if (balls[rowFrom][diagFrom] == null
                 || balls[rowFrom][diagFrom].getPlayer() != currentP) {
             return null;
-        } else if (isNextTo(rowFrom, diagFrom, rowTo, diagTo)) {
+        } else if (Utility.isNextTo(rowFrom, diagFrom, rowTo, diagTo)) {
             int rowD = rowTo - rowFrom; //row direction
             int diagD = diagTo - diagFrom; //diag direction
             int ownBalls = 1;
@@ -189,16 +191,6 @@ public class AbaloneGame implements Board, Cloneable {
             return clone;
         } else {
             return null;
-        }
-    }
-
-    private boolean isNextTo(int rowFrom, int diagFrom, int rowTo, int diagTo) {
-        int row = rowTo - rowFrom;
-        int diag = diagTo - diagFrom;
-        if (row > 1 || diag > 1) {
-            return false;
-        } else {
-            return !((row == 0 && diag == 0) || (diag * row == -1));
         }
     }
 
