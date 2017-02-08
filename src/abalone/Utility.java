@@ -1,11 +1,11 @@
 package abalone;
 
-import java.awt.*;
+import java.awt.Color;
 
 /**
- * Class implementing several useful methods.
+ * Class implementing several useful methods for operating on the game board.
  */
-public class Utility {
+public final class Utility {
 
     private Utility() {
     }

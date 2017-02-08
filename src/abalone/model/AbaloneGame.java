@@ -13,7 +13,7 @@ import java.util.LinkedList;
 public class AbaloneGame implements Board, Cloneable {
 
     private int boardSize = 9;
-    private int halfBSize = Math.floorDiv(boardSize, 2);
+    private int halfBoard = Math.floorDiv(boardSize, 2);
     private Player openingPLayer = Player.HUMAN;
     private Player currentP = Player.HUMAN;
     private Ball[][] balls;
@@ -52,7 +52,7 @@ public class AbaloneGame implements Board, Cloneable {
             openingPLayer = oldOpeningPLayer;
             currentP = openingPLayer;
             boardSize = size;
-            halfBSize = Math.floorDiv(boardSize, 2);
+            halfBoard = Math.floorDiv(boardSize, 2);
             this.level = level;
             balls = new Ball[boardSize][boardSize];
             fillBalls();
@@ -72,7 +72,7 @@ public class AbaloneGame implements Board, Cloneable {
                                                            : Player.HUMAN;
         currentP = openingPLayer;
         boardSize = oldSize;
-        halfBSize = Math.floorDiv(boardSize, 2);
+        halfBoard = Math.floorDiv(boardSize, 2);
         this.level = level;
         balls = new Ball[boardSize][boardSize];
         fillBalls();
@@ -113,8 +113,8 @@ public class AbaloneGame implements Board, Cloneable {
     @Override
     public boolean isValidPosition(int row, int diag) {
         return 0 <= row && row < boardSize
-                && Math.max(0, row - halfBSize) <= diag
-                && diag <= Math.min(row + halfBSize, boardSize - 1);
+                && Math.max(0, row - halfBoard) <= diag
+                && diag <= Math.min(row + halfBoard, boardSize - 1);
     }
 
     /**
@@ -123,8 +123,8 @@ public class AbaloneGame implements Board, Cloneable {
     @Override
     public boolean isValidTarget(int row, int diag) {
         return -1 <= row && row <= boardSize
-                && Math.max(0, row - halfBSize) <= diag + 1
-                && diag - 1 <= Math.min(row + halfBSize, boardSize - 1);
+                && Math.max(0, row - halfBoard) <= diag + 1
+                && diag - 1 <= Math.min(row + halfBoard, boardSize - 1);
     }
 
 
@@ -156,12 +156,12 @@ public class AbaloneGame implements Board, Cloneable {
             int ballCount = 1;
             while (isValidPosition(rowTo, diagTo)
                     && balls[rowTo][diagTo] != null) {
-                if (balls[rowTo][diagTo].getPlayer() == currentP) {
+                if (oppBalls > 0
+                        && balls[rowTo][diagTo].getPlayer() == currentP) {
+                    return null;
+                } else if (balls[rowTo][diagTo].getPlayer() == currentP) {
                     ++ownBalls;
                 } else if (oppBalls + 1 >= ownBalls) {
-                    return null;
-                } else if (oppBalls > 0
-                        && balls[rowTo][diagTo].getPlayer() == currentP) {
                     return null;
                 } else {
                     ++oppBalls;
@@ -278,7 +278,7 @@ public class AbaloneGame implements Board, Cloneable {
             valueMa = WIN_VALUE / depth;
         }
         double posV = 0;
-        for (int row = 0; row <= halfBSize; row++) {
+        for (int row = 0; row <= halfBoard; row++) {
             double distRow = Math.min(row, boardSize - (row + 1));
             for (Ball ball : balls[row]) {
                 if (ball != null) {
@@ -401,17 +401,17 @@ public class AbaloneGame implements Board, Cloneable {
     public String toString() {
         StringBuilder result = new StringBuilder();
         for (int row = boardSize - 1; row >= 0; row--) {
-            for (int firstD = Math.abs(row - halfBSize);
+            for (int firstD = Math.abs(row - halfBoard);
                  firstD > 0; firstD--) {
                 result.append(" ");
             }
-            for (int diag = Math.max(row - halfBSize, 0);
-                 diag <= Math.min(row + halfBSize, boardSize - 1); diag++) {
+            for (int diag = Math.max(row - halfBoard, 0);
+                 diag <= Math.min(row + halfBoard, boardSize - 1); diag++) {
                 Ball ball = balls[row][diag];
                 if (ball == null) {
                     result.append(".");
                 } else {
-                    result.append(ball.toString());
+                    result.append(ball);
                 }
                 result.append(" ");
             }
@@ -453,7 +453,7 @@ public class AbaloneGame implements Board, Cloneable {
         LinkedList<Ball> topBallsList = new LinkedList<>();
         LinkedList<Ball> botBallsList = new LinkedList<>();
         for (int row = 0; row < 2; row++) {
-            for (int diag = 0; diag <= halfBSize + row; diag++) {
+            for (int diag = 0; diag <= halfBoard + row; diag++) {
                 botBallsList.add(new Ball(
                         Player.HUMAN, getHumanColor(), row, diag));
                 topBallsList.add(new Ball(Player.MACHINE, machineColor(),
@@ -461,7 +461,7 @@ public class AbaloneGame implements Board, Cloneable {
             }
         }
         int thirdRow = 2;
-        for (int diag = thirdRow; diag <= halfBSize; diag++) {
+        for (int diag = thirdRow; diag <= halfBoard; diag++) {
             botBallsList.add(new Ball(
                     Player.HUMAN, getHumanColor(), thirdRow, diag));
             topBallsList.add(new Ball(Player.MACHINE, machineColor(),

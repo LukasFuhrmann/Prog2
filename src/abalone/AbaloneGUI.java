@@ -2,12 +2,14 @@ package abalone;
 
 import abalone.View.GameFrame;
 
+import javax.swing.SwingUtilities;
+
 /**
  * Starts the program for an interpretation of Abalone with a GUI.
  */
 public final class AbaloneGUI {
 
-    private AbaloneGUI(){
+    private AbaloneGUI() {
     }
 
     /**
@@ -16,21 +18,11 @@ public final class AbaloneGUI {
      * @param args not used.
      */
     public static void main(String[] args) {
-        Thread eventDispatcher = new Thread(){
-
-            /**
-             * {@inheritDoc}
-             */
+        SwingUtilities.invokeLater(new Thread() {
             @Override
             public void run() {
                 GameFrame frame = new GameFrame();
-                try {
-                    wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
             }
-        };
-        eventDispatcher.start();
+        });
     }
 }

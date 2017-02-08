@@ -2,8 +2,8 @@ package abalone.View;
 
 import abalone.model.Board;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JFrame;
+import java.awt.BorderLayout;
 
 /**
  * Implements the UI frame.
@@ -13,6 +13,9 @@ public class GameFrame extends JFrame {
     private BoardPanel boardPanel = new BoardPanel(9);
     private OptionPanel optionPanel = new OptionPanel();
 
+    /**
+     * Creates new GameFrame with a game of the level 2 and size 9.
+     */
     public GameFrame() {
         super("Abalone");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -28,16 +31,18 @@ public class GameFrame extends JFrame {
     }
 
     void newGame(int size, int level, boolean switched) {
+        stopMachineMove();
         getContentPane().remove(boardPanel);
         boardPanel.removeAll();
-        boardPanel = new BoardPanel(size, level, switched,boardPanel);
+        boardPanel = new BoardPanel(size, level, switched, boardPanel);
         getContentPane().add(boardPanel, BorderLayout.CENTER);
         boardPanel.updateBoard();
         revalidate();
     }
 
-    public static void main(String[] args) {
-        GameFrame g1 = new GameFrame();
+    @SuppressWarnings("deprecation")
+    private void stopMachineMove() {
+        boardPanel.stopThread();
     }
 
     void changeLevel(Integer itemAt) {

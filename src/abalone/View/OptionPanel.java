@@ -1,27 +1,32 @@
 package abalone.View;
 
-import abalone.model.*;
+import abalone.model.Board;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- *  Implements a panel at the the bottom of the frame which shows the game
- *  score and gives several options for starting new games, changing the
- *  level and closing the program.
+ * Implements a panel at the the bottom of the frame which shows the game
+ * score and gives several options for starting new games, changing the
+ * level and closing the program.
  */
 class OptionPanel extends JPanel {
 
     private JButton newB = new JButton("New");
     private JButton switchB = new JButton("Switch");
     private JButton quitB = new JButton("Quit");
-    private static final Integer[] sizes = new Integer[]{7, 9, 11, 13, 15};
-    private JComboBox<Integer> size = new JComboBox<>(sizes);
-    private static final Integer[] levels = new Integer[]{1, 2, 3, 4};
-    private JComboBox<Integer> level = new JComboBox<>(levels);
+    private static final Integer[] SIZES = new Integer[]{7, 9, 11, 13, 15};
+    private JComboBox<Integer> size = new JComboBox<>(SIZES);
+    private static final Integer[] LEVELS = new Integer[]{1, 2, 3, 4};
+    private JComboBox<Integer> level = new JComboBox<>(LEVELS);
     private JLabel whiteScore = new JLabel(" 14 ");
     private JLabel blackScore = new JLabel(" 14 ");
     private JLabel sizeName = new JLabel(" Size: ");
@@ -59,7 +64,7 @@ class OptionPanel extends JPanel {
         addListeners();
     }
 
-    private void addListeners(){
+    private void addListeners() {
         newB.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -80,13 +85,13 @@ class OptionPanel extends JPanel {
         quitB.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ((GameFrame)getTopLevelAncestor()).dispose();
+                ((GameFrame) getTopLevelAncestor()).dispose();
             }
         });
         level.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ((GameFrame)getTopLevelAncestor()).changeLevel(level
+                ((GameFrame) getTopLevelAncestor()).changeLevel(level
                         .getItemAt(level.getSelectedIndex()));
             }
         });
@@ -94,9 +99,9 @@ class OptionPanel extends JPanel {
 
 
     void updateScores(Board game) {
-        whiteScore.setText(" " +
-                game.getNumberOfBalls(abalone.model.Color.WHITE) + " ");
-        blackScore.setText(" " +
-                game.getNumberOfBalls(abalone.model.Color.BLACK) + " ");
+        whiteScore.setText(" "
+                + game.getNumberOfBalls(abalone.model.Color.WHITE) + " ");
+        blackScore.setText(" "
+                + game.getNumberOfBalls(abalone.model.Color.BLACK) + " ");
     }
 }
