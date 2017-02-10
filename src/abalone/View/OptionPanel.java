@@ -25,12 +25,10 @@ class OptionPanel extends JPanel {
     private JButton quitB = new JButton("Quit");
     private static final Integer[] SIZES = new Integer[]{7, 9, 11, 13, 15};
     private JComboBox<Integer> size = new JComboBox<>(SIZES);
-    private static final Integer[] LEVELS = new Integer[]{1, 2, 3, 4};
+    private static final Integer[] LEVELS = new Integer[]{1, 2, 3};
     private JComboBox<Integer> level = new JComboBox<>(LEVELS);
     private JLabel whiteScore = new JLabel(" 14 ");
     private JLabel blackScore = new JLabel(" 14 ");
-    private JLabel sizeName = new JLabel(" Size: ");
-    private JLabel levelName = new JLabel(" Level: ");
 
 
     OptionPanel() {
@@ -41,8 +39,10 @@ class OptionPanel extends JPanel {
         level.setPreferredSize(size.getPreferredSize());
         level.setMaximumSize(level.getPreferredSize());
         add("Black score", blackScore);
+        JLabel levelName = new JLabel(" Level: ");
         add("Level tag", levelName);
         add("Level box", level);
+        JLabel sizeName = new JLabel(" Size: ");
         add("Size tag", sizeName);
         add("Size box", size);
         add(new JPanel());
@@ -85,6 +85,7 @@ class OptionPanel extends JPanel {
         quitB.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                ((GameFrame) getTopLevelAncestor()).stopMachineMove();
                 ((GameFrame) getTopLevelAncestor()).dispose();
             }
         });

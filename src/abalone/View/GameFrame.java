@@ -3,14 +3,17 @@ package abalone.View;
 import abalone.model.Board;
 
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 import java.awt.BorderLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 /**
  * Implements the UI frame.
  */
 public class GameFrame extends JFrame {
 
-    private BoardPanel boardPanel = new BoardPanel(9);
+    private BoardPanel boardPanel = new BoardPanel();
     private OptionPanel optionPanel = new OptionPanel();
 
     /**
@@ -22,6 +25,13 @@ public class GameFrame extends JFrame {
         setLayout(new BorderLayout());
         getContentPane().add(boardPanel, BorderLayout.CENTER);
         getContentPane().add(optionPanel, BorderLayout.SOUTH);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                stopMachineMove();
+                e.getWindow().dispose();
+            }
+        });
         setSize(1000, 700);
         setVisible(true);
     }
@@ -36,16 +46,20 @@ public class GameFrame extends JFrame {
         boardPanel.removeAll();
         boardPanel = new BoardPanel(size, level, switched, boardPanel);
         getContentPane().add(boardPanel, BorderLayout.CENTER);
-        boardPanel.updateBoard();
-        revalidate();
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                boardPanel.updateBoard();
+                revalidate();
+            }
+        });
     }
 
-    @SuppressWarnings("deprecation")
-    private void stopMachineMove() {
+    void stopMachineMove() {
         boardPanel.stopThread();
     }
 
-    void changeLevel(Integer itemAt) {
-        boardPanel.changeLevel(itemAt);
+    void changeLevel(Integer level) {
+        boardPanel.changeLevel(level);
     }
 }

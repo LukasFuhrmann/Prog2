@@ -29,9 +29,9 @@ class BoardPanel extends JPanel {
     private Thread machineMove;
     private MouseListener listener = new BoardListener();
 
-    BoardPanel(int size) {
+    BoardPanel() {
         super();
-        builtBoard(size);
+        builtBoard(game.getSize());
     }
 
     BoardPanel(int size, int level, boolean switched, BoardPanel oldPanel) {
@@ -43,24 +43,25 @@ class BoardPanel extends JPanel {
             game = new AbaloneGame(size, oldPanel.game.getOpeningPlayer(),
                     level);
         }
-        builtBoard(size);
+        builtBoard(game.getSize());
         if (game.getOpeningPlayer() == Player.MACHINE) {
-            machineMove = new Thread() {
-                @Override
-                public void run() {
-                    game = game.machineMove();
-                }
-            };
+            machineMove = new MachineThread();
             machineMove.start();
-            SwingUtilities.invokeLater(machineMove);
         }
     }
 
     void changeLevel(Integer level) {
+        if (machineMove != null) {
+            try {
+                machineMove.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         game.setLevel(level);
     }
 
-    @Deprecated
+    @SuppressWarnings("deprecation")
     void stopThread() {
         if ((machineMove != null) && machineMove.isAlive()) {
             machineMove.stop();
@@ -141,17 +142,25 @@ class BoardPanel extends JPanel {
         if (game.isGameOver()) {
             gameOver();
         } else {
-            machineMove = new Thread() {
+            machineMove = new MachineThread();
+            machineMove.start();
+        }
+    }
+
+    private class MachineThread extends Thread {
+
+        @Override
+        public void run() {
+            game = game.machineMove();
+            SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    game = game.machineMove();
                     updateBoard();
                     if (game.isGameOver()) {
                         gameOver();
                     }
                 }
-            };
-            SwingUtilities.invokeLater(machineMove);
+            });
         }
     }
 
@@ -241,8 +250,8 @@ class BoardPanel extends JPanel {
 
     class GroundPanel extends JPanel {
 
-        protected final Dimension prefSize = new Dimension(20, 20);
-        protected final Color background = new Color(205, 133, 63);
+        private final Dimension prefSize = new Dimension(20, 20);
+        private final Color background = new Color(205, 133, 63);
 
         GroundPanel() {
             super();
@@ -250,6 +259,9 @@ class BoardPanel extends JPanel {
             setBackground(background);
         }
 
+        protected Color getStandardBackground() {
+            return background;
+        }
     }
 
     class GapPanel extends GroundPanel {
@@ -268,13 +280,21 @@ class BoardPanel extends JPanel {
 
     class BorderPanel extends GapPanel {
 
-        protected int diag;
-        protected int row;
+        private int diag;
+        private int row;
 
         BorderPanel(int row, int diag) {
             super();
             this.row = row;
             this.diag = diag;
+        }
+
+        protected int getDiag() {
+            return diag;
+        }
+
+        protected int getRow() {
+            return row;
         }
 
         @Override
@@ -294,12 +314,13 @@ class BoardPanel extends JPanel {
         @Override
         public void paintComponent(Graphics graphics) {
             super.paintComponent(graphics);
-            graphics.setColor(Utility.parseColor(game.getSlot(row, diag)));
+            graphics.setColor(Utility.parseColor(
+                    game.getSlot(getRow(), getDiag())));
             graphics.fillOval(0, 0, getWidth(), getHeight());
         }
 
         void updateBackground() {
-            setBackground(background);
+            setBackground(getStandardBackground());
         }
     }
 }

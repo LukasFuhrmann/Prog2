@@ -22,7 +22,7 @@ public class AbaloneGame implements Board, Cloneable {
     private int whiteBallsLost = 0;
     private int blackBallsLost = 0;
     private int level;
-    private static final double WIN_VALUE = 5000000;
+    private static final double WIN_VALUE = 5000000.0;
     private static final double HUMAN_VALUE = 1.5;
 
     /**
@@ -308,7 +308,7 @@ public class AbaloneGame implements Board, Cloneable {
             bestOption = bucket.get(0);
         }
         for (Node node : bucket) {
-            if (root.getGame().getNextPlayer() == Player.MACHINE) {
+            if (node.getGame().getNextPlayer() == Player.HUMAN) {
                 bestOption = (node.compareTo(bestOption) <= 0) ? bestOption
                                                                : node;
             } else {
@@ -317,7 +317,7 @@ public class AbaloneGame implements Board, Cloneable {
             }
         }
         if (bestOption != root) {
-            root.setScore(bestOption.getScore() + root.getScore());
+            root.setScore(bestOption.getScore());
         }
         if (depth == 1) {
             return bestOption;
